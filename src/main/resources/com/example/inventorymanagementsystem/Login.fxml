@@ -25,7 +25,7 @@
             </AnchorPane>
             <AnchorPane layoutX="350.0" prefHeight="439.0" prefWidth="347.0" styleClass="right-form" stylesheets="@../../../Design/LoginDesign.css" AnchorPane.rightAnchor="0.0">
                <children>
-                  <FontAwesomeIconView fill="#229673" glyphName="USER" layoutX="152.0" layoutY="105.0" size="5em" />
+                  <FontAwesomeIconView fill="#f28542" glyphName="USER" layoutX="152.0" layoutY="105.0" size="5em" />
                   <Label layoutX="72.0" layoutY="122.0" text="Тавтай морил Админ!">
                      <font>
                         <Font name="Tahoma Bold" size="18.0" />

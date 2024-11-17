@@ -63,6 +63,10 @@ public class MainController {
                 alert.setTitle("Мэдэгдэл");
                 alert.setHeaderText(null);
                 alert.setContentText("Амжилттай нэвтэрлээ!");
+                alert.showAndWait();
+
+                // Логин цонхыг нуух
+                loginBtn.getScene().getWindow().hide();
 
                 // Dashboard хуудас нээх
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Dashboard.fxml")));
