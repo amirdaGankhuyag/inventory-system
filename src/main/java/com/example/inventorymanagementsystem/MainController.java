@@ -59,6 +59,7 @@ public class MainController {
 
             // амжилттай нэвтэрвэл
             if(result.next()) {
+                // username, password correct bol dashboard form ruu shiljih
                 alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Мэдэгдэл");
                 alert.setHeaderText(null);
@@ -66,6 +67,9 @@ public class MainController {
                 alert.showAndWait();
 
                 // Логин цонхыг нуух
+                loginBtn.getScene().getWindow().hide();
+
+                // Login form iig nuuh
                 loginBtn.getScene().getWindow().hide();
 
                 // Dashboard хуудас нээх
