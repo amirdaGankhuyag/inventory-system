@@ -20,9 +20,9 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.inventorymanagementsystem.DashboardController">
    <children>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+      <AnchorPane fx:id="main_form" prefHeight="200.0" prefWidth="200.0">
          <children>
             <BorderPane layoutX="70.0" layoutY="52.0" prefHeight="600.0" prefWidth="1100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <top>
@@ -36,12 +36,12 @@
                                     <Font name="Tahoma" size="15.0" />
                                  </font>
                               </Label>
-                              <Button layoutX="1058.0" layoutY="7.0" mnemonicParsing="false" styleClass="close" stylesheets="@../../../Design/DashboardDesign.css" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
+                              <Button fx:id="close" layoutX="1044.0" layoutY="3.0" mnemonicParsing="false" onAction="#close" prefHeight="24.0" prefWidth="60.0" styleClass="close" stylesheets="@../../../Design/DashboardDesign.css" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="3.0">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="CLOSE" size="1.2em" />
                                  </graphic>
                               </Button>
-                              <Button layoutX="1036.0" layoutY="4.0" mnemonicParsing="false" styleClass="minimize" stylesheets="@../../../Design/DashboardDesign.css">
+                              <Button fx:id="minimize" layoutX="990.0" layoutY="4.0" mnemonicParsing="false" onAction="#minimize" prefWidth="53.0" styleClass="minimize" stylesheets="@../../../Design/DashboardDesign.css">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="MINUS" size="1.2em" />
                                  </graphic>
@@ -62,28 +62,28 @@
                                     <Font name="Tahoma" size="17.0" />
                                  </font>
                               </Label>
-                              <Label alignment="CENTER" layoutX="9.0" layoutY="135.0" prefHeight="23.0" prefWidth="191.0" text="User" textFill="WHITE">
+                              <Label fx:id="username" alignment="CENTER" layoutX="9.0" layoutY="135.0" prefHeight="23.0" prefWidth="191.0" text="User" textFill="WHITE">
                                  <font>
                                     <Font name="Arial Bold" size="20.0" />
                                  </font>
                               </Label>
                               <Line endX="85.40000915527344" endY="-1.52587890625E-5" layoutX="102.0" layoutY="173.0" startX="-82.59999084472656" startY="-1.52587890625E-5" stroke="WHITE" />
-                              <Button layoutX="15.0" layoutY="203.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Нүүр">
+                              <Button fx:id="home_btn" layoutX="15.0" layoutY="203.0" mnemonicParsing="false" onAction="#switchForm" prefHeight="35.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Нүүр">
                                  <graphic>
                                     <FontAwesomeIconView fill="WHITE" glyphName="HOME" size="1.5em" />
                                  </graphic>
                               </Button>
-                              <Button layoutX="15.0" layoutY="238.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Бараа">
+                              <Button fx:id="addProducts_btn" layoutX="15.0" layoutY="238.0" mnemonicParsing="false" onAction="#switchForm" prefHeight="35.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Бараа">
                                  <graphic>
                                     <FontAwesomeIconView fill="WHITE" glyphName="PLUS" size="1.5em" wrappingWidth="17.142857551574707" />
                                  </graphic>
                               </Button>
-                              <Button layoutX="15.0" layoutY="273.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Захиалга">
+                              <Button fx:id="orders_btn" layoutX="15.0" layoutY="273.0" mnemonicParsing="false" onAction="#switchForm" prefHeight="35.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Захиалга">
                                  <graphic>
                                     <FontAwesomeIconView fill="WHITE" glyphName="CUBE" size="1.5em" wrappingWidth="17.0" />
                                  </graphic>
                               </Button>
-                              <Button layoutX="15.0" layoutY="489.0" mnemonicParsing="false" stylesheets="@../../../Design/DashboardDesign.css">
+                              <Button fx:id="logout" layoutX="15.0" layoutY="489.0" mnemonicParsing="false" onAction="#logout" stylesheets="@../../../Design/DashboardDesign.css">
                                  <graphic>
                                     <FontAwesomeIconView fill="WHITE" glyphName="SIGN_OUT" size="2em" />
                                  </graphic>
@@ -105,7 +105,7 @@
                <center>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <children>
-                        <AnchorPane layoutX="31.0" layoutY="88.0" prefHeight="554.4" prefWidth="892.8" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane fx:id="home_form" layoutX="31.0" layoutY="88.0" prefHeight="554.4" prefWidth="892.8" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="154.0" prefWidth="862.0" stylesheets="@../../../Design/DashboardDesign.css">
                                  <styleClass>
@@ -121,7 +121,7 @@
                                                 <Font name="Tahoma" size="15.0" />
                                              </font>
                                           </Label>
-                                          <Label alignment="CENTER_RIGHT" layoutX="94.0" layoutY="43.0" prefHeight="22.0" prefWidth="140.0" text="0" textFill="WHITE">
+                                          <Label fx:id="home_numberOrder" alignment="CENTER_RIGHT" layoutX="94.0" layoutY="43.0" prefHeight="22.0" prefWidth="140.0" text="0" textFill="WHITE">
                                              <font>
                                                 <Font name="Berlin Sans FB" size="20.0" />
                                              </font>
@@ -135,7 +135,7 @@
                                                 <Font name="Tahoma" size="15.0" />
                                              </font>
                                           </Label>
-                                          <Label alignment="CENTER_RIGHT" layoutX="101.0" layoutY="43.0" prefHeight="22.0" prefWidth="140.0" text="0.0 ₮" textFill="WHITE">
+                                          <Label fx:id="home_totalIncome" alignment="CENTER_RIGHT" layoutX="101.0" layoutY="43.0" prefHeight="22.0" prefWidth="140.0" text="0.0 ₮" textFill="WHITE">
                                              <font>
                                                 <Font name="Berlin Sans FB" size="20.0" />
                                              </font>
@@ -149,7 +149,7 @@
                                                 <Font name="Tahoma" size="15.0" />
                                              </font>
                                           </Label>
-                                          <Label alignment="CENTER_RIGHT" layoutX="96.0" layoutY="43.0" prefHeight="22.0" prefWidth="140.0" text="0" textFill="WHITE">
+                                          <Label fx:id="home_availableProducts" alignment="CENTER_RIGHT" layoutX="96.0" layoutY="43.0" prefHeight="22.0" prefWidth="140.0" text="0" textFill="WHITE">
                                              <font>
                                                 <Font name="Berlin Sans FB" size="20.0" />
                                              </font>
@@ -169,7 +169,7 @@
                                           <String fx:value="shadow" />
                                        </styleClass>
                                        <children>
-                                          <AreaChart layoutX="-59.0" layoutY="-102.0" prefHeight="312.0" prefWidth="455.0" title="Орлогын график" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <AreaChart fx:id="home_incomeChart" layoutX="-59.0" layoutY="-102.0" prefHeight="312.0" prefWidth="455.0" title="Орлогын график" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <xAxis>
                                               <CategoryAxis side="BOTTOM" />
                                             </xAxis>
@@ -185,7 +185,7 @@
                                           <String fx:value="shadow" />
                                        </styleClass>
                                        <children>
-                                          <BarChart layoutX="-78.0" layoutY="-74.0" prefHeight="326.0" prefWidth="422.0" title="Захиалгын график" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <BarChart fx:id="home_orderChart" layoutX="-78.0" layoutY="-74.0" prefHeight="326.0" prefWidth="422.0" title="Захиалгын график" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <xAxis>
                                               <CategoryAxis side="BOTTOM" />
                                             </xAxis>
@@ -200,7 +200,7 @@
                               <Line endX="761.6000366210938" endY="-1.52587890625E-5" layoutX="116.0" layoutY="180.0" startX="-100.0" stroke="#bf6d26" />
                            </children>
                         </AnchorPane>
-                        <AnchorPane layoutX="104.0" layoutY="56.0" prefHeight="555.0" prefWidth="893.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane fx:id="addProducts_form" layoutX="104.0" layoutY="56.0" prefHeight="555.0" prefWidth="893.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane layoutX="14.0" layoutY="18.0" prefHeight="519.0" prefWidth="331.0" stylesheets="@../../../Design/DashboardDesign.css">
                                  <styleClass>
@@ -214,8 +214,8 @@
                                           <String fx:value="shadow" />
                                        </styleClass>
                                        <children>
-                                          <ImageView fitHeight="136.0" fitWidth="111.0" pickOnBounds="true" preserveRatio="true" />
-                                          <Button layoutY="110.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="111.0" text="Зураг оруулах" />
+                                          <ImageView fx:id="addProducts_imageView" fitHeight="136.0" fitWidth="111.0" pickOnBounds="true" preserveRatio="true" />
+                                          <Button fx:id="addProducts_importBtn" layoutY="110.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="111.0" text="Зураг оруулах" />
                                        </children>
                                     </AnchorPane>
                                     <Label layoutX="47.0" layoutY="186.0" text="Барааны ID:">
@@ -223,41 +223,41 @@
                                           <Font name="Tahoma" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField layoutX="140.0" layoutY="183.0" />
+                                    <TextField fx:id="addProducts_productId" layoutX="140.0" layoutY="183.0" />
                                     <Label layoutX="47.0" layoutY="218.0" text="Төрөл:">
                                        <font>
                                           <Font name="Tahoma" size="14.0" />
                                        </font>
                                     </Label>
-                                    <ComboBox layoutX="140.0" layoutY="215.0" prefWidth="150.0" promptText="Сонгох" />
+                                    <ComboBox fx:id="addProducts_productType" layoutX="140.0" layoutY="215.0" prefWidth="150.0" promptText="Сонгох" />
                                     <Label layoutX="47.0" layoutY="250.0" text="Бренд:">
                                        <font>
                                           <Font name="Tahoma" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField layoutX="140.0" layoutY="247.0" />
+                                    <TextField fx:id="addProducts_brand" layoutX="140.0" layoutY="247.0" />
                                     <Label layoutX="47.0" layoutY="282.0" text="Барааны нэр:">
                                        <font>
                                           <Font name="Tahoma" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField layoutX="140.0" layoutY="279.0" />
+                                    <TextField fx:id="addProducts_productName" layoutX="140.0" layoutY="279.0" />
                                     <Label layoutX="47.0" layoutY="314.0" text="Төлөв:">
                                        <font>
                                           <Font name="Tahoma" size="14.0" />
                                        </font>
                                     </Label>
-                                    <ComboBox layoutX="140.0" layoutY="311.0" prefWidth="150.0" promptText="Сонгох" />
-                                    <Button layoutX="54.0" layoutY="392.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="74.0" text="Нэмэх" />
-                                    <Button layoutX="204.0" layoutY="392.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="74.0" text="Шинэчлэх" />
-                                    <Button layoutX="54.0" layoutY="455.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="74.0" text="Ресет" />
-                                    <Button layoutX="204.0" layoutY="455.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="74.0" text="Устгах" />
+                                    <ComboBox fx:id="addProducts_status" layoutX="140.0" layoutY="311.0" prefWidth="150.0" promptText="Сонгох" />
+                                    <Button fx:id="addProducts_addBtn" layoutX="54.0" layoutY="392.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="74.0" text="Нэмэх" />
+                                    <Button fx:id="addProducts_updateBtn" layoutX="204.0" layoutY="392.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="74.0" text="Шинэчлэх" />
+                                    <Button fx:id="addProducts_resetBtn" layoutX="54.0" layoutY="455.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="74.0" text="Арилгах" />
+                                    <Button fx:id="addProducts_deleteBtn" layoutX="204.0" layoutY="455.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="74.0" text="Устгах" />
                                     <Label layoutX="46.0" layoutY="346.0" text="Үнэ:">
                                        <font>
                                           <Font name="Tahoma" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField layoutX="140.0" layoutY="343.0" />
+                                    <TextField fx:id="addProducts_price" layoutX="140.0" layoutY="343.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="361.0" layoutY="18.0" prefHeight="519.0" prefWidth="518.0" stylesheets="@../../../Design/DashboardDesign.css">
@@ -266,23 +266,23 @@
                                     <String fx:value="shadow" />
                                  </styleClass>
                                  <children>
-                                    <TableView layoutX="10.0" layoutY="60.0" prefHeight="447.0" prefWidth="498.0">
+                                    <TableView fx:id="addProducts_tableView" layoutX="10.0" layoutY="60.0" prefHeight="447.0" prefWidth="498.0">
                                       <columns>
-                                        <TableColumn prefWidth="75.0" text="Барааны ID" />
-                                        <TableColumn prefWidth="71.0" text="Төрөл" />
-                                          <TableColumn prefWidth="71.0" text="Бренд" />
-                                          <TableColumn prefWidth="101.0" text="Барааны нэр" />
-                                          <TableColumn prefWidth="111.0" text="Үнэ" />
-                                          <TableColumn prefWidth="68.0" text="Төлөв" />
+                                        <TableColumn fx:id="addProducts_col_productId" prefWidth="75.0" text="Барааны ID" />
+                                        <TableColumn fx:id="addProducts_col_type" prefWidth="71.0" text="Төрөл" />
+                                          <TableColumn fx:id="addProducts_col_brand" prefWidth="71.0" text="Бренд" />
+                                          <TableColumn fx:id="addProducts_col_productName" prefWidth="101.0" text="Барааны нэр" />
+                                          <TableColumn fx:id="addProducts_col_price" prefWidth="111.0" text="Үнэ" />
+                                          <TableColumn fx:id="addProducts_col_status" prefWidth="68.0" text="Төлөв" />
                                       </columns>
                                     </TableView>
-                                    <TextField layoutX="10.0" layoutY="14.0" prefHeight="30.0" prefWidth="225.0" promptText="Хайлт" />
+                                    <TextField fx:id="addProducts_search" layoutX="10.0" layoutY="14.0" prefHeight="30.0" prefWidth="225.0" promptText="Хайлт" />
                                     <FontAwesomeIconView fill="#949494" glyphName="SEARCH" layoutX="24.0" layoutY="33.0" size="1.5em" />
                                  </children>
                               </AnchorPane>
                            </children>
                         </AnchorPane>
-                        <AnchorPane prefHeight="555.0" prefWidth="893.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane fx:id="orders_form" prefHeight="555.0" prefWidth="893.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane layoutX="14.0" layoutY="15.0" prefHeight="525.0" prefWidth="552.0" stylesheets="@../../../Design/DashboardDesign.css">
                                  <styleClass>
@@ -290,13 +290,13 @@
                                     <String fx:value="shadow" />
                                  </styleClass>
                                  <children>
-                                    <TableView layoutX="13.0" layoutY="13.0" prefHeight="499.0" prefWidth="530.0">
+                                    <TableView fx:id="orders_tableView" layoutX="13.0" layoutY="13.0" prefHeight="499.0" prefWidth="530.0">
                                       <columns>
-                                        <TableColumn prefWidth="91.0" text="Төрөл" />
-                                        <TableColumn prefWidth="95.0" text="Бренд" />
-                                          <TableColumn prefWidth="131.0" text="Барааны нэр" />
-                                          <TableColumn prefWidth="102.0" text="Тоо хэмжээ" />
-                                          <TableColumn prefWidth="109.0" text="Үнэ" />
+                                        <TableColumn fx:id="orders_col_type" prefWidth="91.0" text="Төрөл" />
+                                        <TableColumn fx:id="orders_col_brand" prefWidth="95.0" text="Бренд" />
+                                          <TableColumn fx:id="orders_col_productName" prefWidth="131.0" text="Барааны нэр" />
+                                          <TableColumn fx:id="orders_col_quantity" prefWidth="102.0" text="Тоо хэмжээ" />
+                                          <TableColumn fx:id="orders_col_price" prefWidth="109.0" text="Үнэ" />
                                       </columns>
                                     </TableView>
                                  </children>
@@ -312,20 +312,20 @@
                                           <Font size="15.0" />
                                        </font>
                                     </Label>
-                                    <ComboBox layoutX="123.0" layoutY="20.0" prefWidth="150.0" promptText="Сонгох" />
+                                    <ComboBox fx:id="orders_productType" layoutX="123.0" layoutY="20.0" prefWidth="150.0" promptText="Сонгох" />
                                     <Label layoutX="57.0" layoutY="58.0" text="Бренд:">
                                        <font>
                                           <Font size="15.0" />
                                        </font>
                                     </Label>
-                                    <ComboBox layoutX="123.0" layoutY="56.0" prefWidth="150.0" promptText="Сонгох" />
+                                    <ComboBox fx:id="orders_brand" layoutX="123.0" layoutY="56.0" prefWidth="150.0" promptText="Сонгох" />
                                     <Label layoutX="11.0" layoutY="92.0" text="Барааны нэр:">
                                        <font>
                                           <Font size="15.0" />
                                        </font>
                                     </Label>
-                                    <ComboBox layoutX="123.0" layoutY="90.0" prefWidth="150.0" promptText="Сонгох" />
-                                    <Spinner layoutX="123.0" layoutY="126.0" prefHeight="25.0" prefWidth="110.0" />
+                                    <ComboBox fx:id="orders_productName" layoutX="123.0" layoutY="90.0" prefWidth="150.0" promptText="Сонгох" />
+                                    <Spinner fx:id="orders_quantity" layoutX="123.0" layoutY="126.0" prefHeight="25.0" prefWidth="110.0" />
                                     <Label layoutX="19.0" layoutY="128.0" text="Тоо хэмжээ:">
                                        <font>
                                           <Font size="15.0" />
@@ -336,7 +336,7 @@
                                           <Font size="18.0" />
                                        </font>
                                     </Label>
-                                    <Label layoutX="109.0" layoutY="231.0" prefHeight="23.0" prefWidth="150.0" text="0.0₮">
+                                    <Label fx:id="orders_total" layoutX="109.0" layoutY="231.0" prefHeight="23.0" prefWidth="150.0" text="0.0₮">
                                        <font>
                                           <Font name="Arial" size="20.0" />
                                        </font>
@@ -346,20 +346,20 @@
                                           <Font name="Tahoma" size="18.0" />
                                        </font>
                                     </Label>
-                                    <TextField layoutX="110.0" layoutY="272.0" />
+                                    <TextField fx:id="orders_amount" layoutX="110.0" layoutY="272.0" />
                                     <Label layoutX="26.0" layoutY="313.0" text="Үлдэгдэл:">
                                        <font>
                                           <Font size="18.0" />
                                        </font>
                                     </Label>
-                                    <Label layoutX="110.0" layoutY="315.0" prefHeight="23.0" prefWidth="149.0" text="0.0₮">
+                                    <Label fx:id="orders_balance" layoutX="110.0" layoutY="315.0" prefHeight="23.0" prefWidth="149.0" text="0.0₮">
                                        <font>
                                           <Font name="Arial" size="20.0" />
                                        </font>
                                     </Label>
-                                    <Button layoutX="177.0" layoutY="374.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" text="Төлөх" />
-                                    <Button layoutX="39.0" layoutY="374.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" text="Баримт" />
-                                    <Button layoutX="39.0" layoutY="431.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" text="Арилгах" />
+                                    <Button fx:id="orders_payBtn" layoutX="177.0" layoutY="374.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" text="Төлөх" />
+                                    <Button fx:id="orders_receiptBtn" layoutX="39.0" layoutY="374.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" text="Баримт" />
+                                    <Button fx:id="orders_resetBtn" layoutX="39.0" layoutY="431.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" text="Арилгах" />
                                  </children>
                               </AnchorPane>
                            </children>

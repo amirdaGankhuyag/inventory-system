@@ -5,8 +5,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,6 +35,10 @@ public class MainController {
     private Connection connect;
     private PreparedStatement prepare;
     private ResultSet result;
+
+
+    private double x = 0;
+    private double y = 0;
 
     public void loginAdmin() {
         String sql = "SELECT * FROM admin WHERE username = ? and password = ?";
@@ -69,14 +75,25 @@ public class MainController {
                 // Логин цонхыг нуух
                 loginBtn.getScene().getWindow().hide();
 
-                // Login form iig nuuh
-                loginBtn.getScene().getWindow().hide();
 
                 // Dashboard хуудас нээх
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Dashboard.fxml")));
                 Stage stage = new Stage();
                 stage.setTitle("Бараа агуулахын систем | Админ хуудас");
                 Scene scene = new Scene(root);
+
+                root.setOnMousePressed((MouseEvent event) -> {
+                    x = event.getSceneX();
+                    y = event.getSceneY();
+                });
+
+                root.setOnMouseDragged((MouseEvent event) -> {
+                    stage.setX(event.getScreenX() - x);
+                    stage.setY(event.getScreenY() - y);
+                });
+
+                stage.initStyle(StageStyle.TRANSPARENT);
+
                 stage.setScene(scene);
                 stage.show();
             } else { // Амжилтгүй болвол
