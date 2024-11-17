@@ -182,17 +182,29 @@ public class DashboardController implements Initializable {
             home_form.setVisible(true);
             addProducts_form.setVisible(false);
             orders_form.setVisible(false);
+
+            home_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
+            addProducts_btn.setStyle("-fx-background-color: transparent");
+            orders_btn.setStyle("-fx-background-color: transparent");
         }
         else if(event.getSource() == addProducts_btn) {
             home_form.setVisible(false);
             addProducts_form.setVisible(true);
             orders_form.setVisible(false);
 
+            addProducts_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
+            home_btn.setStyle("-fx-background-color: transparent");
+            orders_btn.setStyle("-fx-background-color: transparent");
+
         }
         else if(event.getSource() == orders_btn) {
             home_form.setVisible(false);
             addProducts_form.setVisible(false);
             orders_form.setVisible(true);
+
+            orders_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
+            addProducts_btn.setStyle("-fx-background-color: transparent");
+            home_btn.setStyle("-fx-background-color: transparent");
         }
     }
 
