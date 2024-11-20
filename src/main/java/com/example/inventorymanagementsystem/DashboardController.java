@@ -200,7 +200,7 @@ public class DashboardController implements Initializable {
 
     private Image image;
 
-    // Бараа нэмэх функц
+    // Database-д бараа нэмэх функц
     public void addProductsAdd() {
         String sql = "INSERT INTO product (product_id, type, brand, productName, price, status, image, date) "
                 + "VALUES(?,?,?,?,?,?,?,?)";
@@ -256,8 +256,8 @@ public class DashboardController implements Initializable {
                     prepare.setString(8, String.valueOf(sqlDate));
 
                     prepare.executeUpdate(); // өөрчлөлтийг db-д оруулна
-                    addProductsShowListData();
-                    addProductsReset();
+                    addProductsShowListData(); // хүснэгтийг шинэчлэнэ
+                    addProductsReset(); // талбаруудыг цэвэрлэнэ
                 }
             }
         } catch (Exception e) {
@@ -394,7 +394,6 @@ public class DashboardController implements Initializable {
     }
 
     private String[] listType = {"Зууш", "Ундаа", "Десерт", "Хувийн бараа", "Бусад"};
-
     public void addProductsListType() {
         List<String> listT = new ArrayList<>();
 
@@ -404,7 +403,6 @@ public class DashboardController implements Initializable {
     }
 
     private String[] listStatus = {"Боломжтой", "Боломжгүй"};
-
     public void addProductsListStatus() {
         List<String> listS = new ArrayList<>();
 
@@ -477,6 +475,7 @@ public class DashboardController implements Initializable {
 
     private ObservableList<productData> addProductsList;
 
+    // Барааны мэдээллээр хүснэгтийн багануудыг дүүргэх
     public void addProductsShowListData() {
         addProductsList = addProductsListData();
 
@@ -490,6 +489,7 @@ public class DashboardController implements Initializable {
         addProducts_tableView.setItems(addProductsList);
     }
 
+    // Хүснэгтэн дэх барааны мэдээлэл дээр дарахад дэлгэрэнгүйг харуулах функц
     public void addProductsSelect() {
         productData prodD = addProducts_tableView.getSelectionModel().getSelectedItem();
         int num = addProducts_tableView.getSelectionModel().getSelectedIndex();
@@ -500,6 +500,7 @@ public class DashboardController implements Initializable {
         addProducts_brand.setText(prodD.getBrand());
         addProducts_productName.setText(prodD.getProductName());
         addProducts_price.setText(String.valueOf(prodD.getPrice()));
+        // dropdown fill хийх хэсэг нэмэх
 
         String uri = "file: " + prodD.getImage();
         image = new Image(uri, 111, 136, false, true);
