@@ -57,6 +57,11 @@
     -fx-background-radius: 6px;
 }
 
+.card {
+    -fx-background-color: linear-gradient(to right, #2e4d39, #396b57);
+    -fx-background-radius: 5px;
+}
+
 .textfield {
     -fx-background-color: linear-gradient(to bottom, #efefef, #eee);
     -fx-background-radius: 4px;
@@ -76,7 +81,6 @@
     -fx-font-size: 13px;
     -fx-font-family: "Arial";
     -fx-cursor: hand;
-
 }
 
 .add-btn {

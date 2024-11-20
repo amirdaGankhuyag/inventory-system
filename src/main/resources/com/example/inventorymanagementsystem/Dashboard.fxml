@@ -113,7 +113,7 @@
                                     <String fx:value="shadow" />
                                  </styleClass>
                                  <children>
-                                    <AnchorPane layoutX="14.0" layoutY="10.0" prefHeight="134.0" prefWidth="256.0" styleClass="nav-form" stylesheets="@../../../Design/DashboardDesign.css">
+                                    <AnchorPane layoutX="14.0" layoutY="10.0" prefHeight="134.0" prefWidth="256.0" styleClass="card" stylesheets="@../../../Design/DashboardDesign.css">
                                        <children>
                                           <FontAwesomeIconView fill="WHITE" glyphName="USERS" layoutX="25.0" layoutY="77.0" selectionEnd="5" selectionStart="5" size="4em" />
                                           <Label layoutX="37.0" layoutY="101.0" text="Өнөөдрийн захиалгын тоо" textFill="WHITE">
@@ -127,7 +127,7 @@
                                              </font>
                                           </Label>
                                        </children></AnchorPane>
-                                    <AnchorPane layoutX="294.0" layoutY="10.0" prefHeight="134.0" prefWidth="272.0" styleClass="nav-form" stylesheets="@../../../Design/DashboardDesign.css">
+                                    <AnchorPane layoutX="294.0" layoutY="10.0" prefHeight="134.0" prefWidth="272.0" styleClass="card" stylesheets="@../../../Design/DashboardDesign.css">
                                        <children>
                                           <FontAwesomeIconView fill="WHITE" glyphName="MONEY" layoutX="32.0" layoutY="77.0" selectionEnd="5" selectionStart="5" size="4em" />
                                           <Label layoutX="93.0" layoutY="101.0" text="Нийт орлого" textFill="WHITE">
@@ -141,7 +141,7 @@
                                              </font>
                                           </Label>
                                        </children></AnchorPane>
-                                    <AnchorPane layoutX="586.0" layoutY="10.0" prefHeight="134.0" prefWidth="262.0" styleClass="nav-form" stylesheets="@../../../Design/DashboardDesign.css">
+                                    <AnchorPane layoutX="586.0" layoutY="10.0" prefHeight="134.0" prefWidth="262.0" styleClass="card" stylesheets="@../../../Design/DashboardDesign.css">
                                        <children>
                                           <FontAwesomeIconView fill="WHITE" glyphName="CUBE" layoutX="27.0" layoutY="77.0" selectionEnd="5" selectionStart="5" size="4em" />
                                           <Label layoutX="50.0" layoutY="101.0" text="Үлдэгдэлтэй бараанууд" textFill="WHITE">
@@ -229,7 +229,7 @@
                                           <Font name="Tahoma" size="14.0" />
                                        </font>
                                     </Label>
-                                    <ComboBox fx:id="addProducts_productType" layoutX="140.0" layoutY="215.0" prefWidth="150.0" promptText="Сонгох" styleClass="textfield" stylesheets="@../../../Design/DashboardDesign.css" />
+                                    <ComboBox fx:id="addProducts_productType" layoutX="140.0" layoutY="215.0" onAction="#addProductsListType" prefWidth="150.0" promptText="Сонгох" styleClass="textfield" stylesheets="@../../../Design/DashboardDesign.css" />
                                     <Label layoutX="47.0" layoutY="250.0" text="Бренд:">
                                        <font>
                                           <Font name="Tahoma" size="14.0" />
@@ -247,11 +247,11 @@
                                           <Font name="Tahoma" size="14.0" />
                                        </font>
                                     </Label>
-                                    <ComboBox fx:id="addProducts_status" layoutX="140.0" layoutY="311.0" prefWidth="150.0" promptText="Сонгох" styleClass="textfield" stylesheets="@../../../Design/DashboardDesign.css" />
-                                    <Button fx:id="addProducts_addBtn" layoutX="54.0" layoutY="392.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="86.0" styleClass="add-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Нэмэх" />
-                                    <Button fx:id="addProducts_updateBtn" layoutX="192.0" layoutY="392.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="86.0" styleClass="update-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Шинэчлэх" />
-                                    <Button fx:id="addProducts_resetBtn" layoutX="54.0" layoutY="455.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="86.0" styleClass="clear-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Арилгах" />
-                                    <Button fx:id="addProducts_deleteBtn" layoutX="192.0" layoutY="455.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="86.0" styleClass="delete-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Устгах" />
+                                    <ComboBox fx:id="addProducts_status" layoutX="140.0" layoutY="311.0" onAction="#addProductsListStatus" prefWidth="150.0" promptText="Сонгох" styleClass="textfield" stylesheets="@../../../Design/DashboardDesign.css" />
+                                    <Button fx:id="addProducts_addBtn" layoutX="54.0" layoutY="392.0" mnemonicParsing="false" onAction="#addProductsAdd" prefHeight="43.0" prefWidth="86.0" styleClass="add-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Нэмэх" />
+                                    <Button fx:id="addProducts_updateBtn" layoutX="192.0" layoutY="392.0" mnemonicParsing="false" onAction="#addProductsUpdate" prefHeight="43.0" prefWidth="86.0" styleClass="update-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Шинэчлэх" />
+                                    <Button fx:id="addProducts_resetBtn" layoutX="54.0" layoutY="455.0" mnemonicParsing="false" onAction="#addProductsReset" prefHeight="43.0" prefWidth="86.0" styleClass="clear-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Арилгах" />
+                                    <Button fx:id="addProducts_deleteBtn" layoutX="192.0" layoutY="455.0" mnemonicParsing="false" onAction="#addProductsDelete" prefHeight="43.0" prefWidth="86.0" styleClass="delete-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Устгах" />
                                     <Label layoutX="46.0" layoutY="346.0" text="Үнэ:">
                                        <font>
                                           <Font name="Tahoma" size="14.0" />
@@ -266,7 +266,7 @@
                                     <String fx:value="shadow" />
                                  </styleClass>
                                  <children>
-                                    <TableView fx:id="addProducts_tableView" layoutX="10.0" layoutY="60.0" prefHeight="447.0" prefWidth="498.0">
+                                    <TableView fx:id="addProducts_tableView" layoutX="10.0" layoutY="60.0" onMouseClicked="#addProductsSelect" prefHeight="447.0" prefWidth="498.0">
                                       <columns>
                                         <TableColumn fx:id="addProducts_col_productId" prefWidth="75.0" text="Барааны ID" />
                                         <TableColumn fx:id="addProducts_col_type" prefWidth="71.0" text="Төрөл" />
@@ -276,7 +276,7 @@
                                           <TableColumn fx:id="addProducts_col_status" prefWidth="68.0" text="Төлөв" />
                                       </columns>
                                     </TableView>
-                                    <TextField fx:id="addProducts_search" layoutX="10.0" layoutY="14.0" prefHeight="30.0" prefWidth="225.0" promptText="Хайлт" styleClass="search" stylesheets="@../../../Design/DashboardDesign.css" />
+                                    <TextField fx:id="addProducts_search" layoutX="10.0" layoutY="14.0" onAction="#addProductsSearch" prefHeight="30.0" prefWidth="225.0" promptText="Хайлт" styleClass="search" stylesheets="@../../../Design/DashboardDesign.css" />
                                     <FontAwesomeIconView fill="#949494" glyphName="SEARCH" layoutX="18.0" layoutY="33.0" size="1.5em" />
                                  </children>
                               </AnchorPane>

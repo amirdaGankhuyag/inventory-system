@@ -2,6 +2,8 @@ package com.example.inventorymanagementsystem;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,8 +29,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class DashboardController implements Initializable {
 
@@ -191,7 +192,7 @@ public class DashboardController implements Initializable {
     @FXML
     private Button orders_addBtn;
 
-//    database toolvvd
+    // Database-тэй холбоотой хэрэглүүрүүд
     private Connection connect;
     private PreparedStatement prepare;
     private Statement statement;
@@ -199,23 +200,248 @@ public class DashboardController implements Initializable {
 
     private Image image;
 
+    // Бараа нэмэх функц
     public void addProductsAdd() {
-        String sql = "INSERT INTO product (product_id, type, brand, productName, price, status, image, date) ";
+        String sql = "INSERT INTO product (product_id, type, brand, productName, price, status, image, date) "
+                + "VALUES(?,?,?,?,?,?,?,?)";
+        connect = Database.connectDB();
+
+        try {
+            // Аль нэг талбар нь хоосон бол алдаа өгнө
+            Alert alert;
+            if (addProducts_productId.getText().isEmpty() ||
+                    addProducts_productType.getSelectionModel().getSelectedItem() == null ||
+                    addProducts_brand.getText().isEmpty() ||
+                    addProducts_productName.getText().isEmpty() ||
+                    addProducts_price.getText().isEmpty() ||
+                    addProducts_status.getSelectionModel().getSelectedItem() == null ||
+                    getData.path == "") {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Алдааны мэдэгдэл");
+                alert.setHeaderText(null);
+                alert.setContentText("Хоосон талбаруудыг бөглөнө үү!");
+                alert.showAndWait();
+            } else {
+                // Алдаагүй үед
+
+                // Тухайн ID-тай бараа аль хэдийн байгаа эсэхийг шалгана
+                String checkData = "SELECT product_id FROM product WHERE product_id = '" + addProducts_productId.getText() + "'";
+                statement = connect.createStatement();
+                result = statement.executeQuery(checkData);
+
+                // Хэрэв байвал
+                if (result.next()) {
+                    alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Алдааны мэдэгдэл");
+                    alert.setHeaderText(null);
+                    alert.setContentText(addProducts_productId.getText() + " дугаартай бараа аль хэдийн нэмэгдсэн байна!");
+                    alert.showAndWait();
+                } else {
+                    // Байхгүй бол
+                    assert connect != null;
+                    prepare = connect.prepareStatement(sql);
+                    prepare.setString(1, addProducts_productId.getText());
+                    prepare.setString(2, (String) addProducts_productType.getSelectionModel().getSelectedItem());
+                    prepare.setString(3, addProducts_brand.getText());
+                    prepare.setString(4, addProducts_productName.getText());
+                    prepare.setString(5, addProducts_price.getText());
+                    prepare.setString(6, (String) addProducts_status.getSelectionModel().getSelectedItem());
+
+                    String uri = getData.path;
+                    uri = uri.replace("\\", "\\\\");
+                    prepare.setString(7, uri);
+
+                    Date date = new Date();
+                    java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+                    prepare.setString(8, String.valueOf(sqlDate));
+
+                    prepare.executeUpdate(); // өөрчлөлтийг db-д оруулна
+                    addProductsShowListData();
+                    addProductsReset();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
+    public void addProductsUpdate() {
+        String uri = getData.path;
+        uri = uri.replace("\\", "\\\\");
+
+        Date date = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+        String sql = "UPDATE product SET " +
+                "type = '" + addProducts_productType.getSelectionModel().getSelectedItem()
+                + "', brand = '" + addProducts_brand.getText()
+                + "', productName = '" + addProducts_productName.getText()
+                + "', price = '" + addProducts_price.getText()
+                + "', status = '" + addProducts_status.getSelectionModel().getSelectedItem()
+                + "', image = '" + uri + "', date = '" + sqlDate + "' WHERE product_id = '"
+                + addProducts_productId.getText() + "'";
+
+        connect = Database.connectDB();
+
+        try {
+            Alert alert;
+            if (addProducts_productId.getText().isEmpty() ||
+                    addProducts_productType.getSelectionModel().getSelectedItem() == null ||
+                    addProducts_brand.getText().isEmpty() ||
+                    addProducts_productName.getText().isEmpty() ||
+                    addProducts_price.getText().isEmpty() ||
+                    addProducts_status.getSelectionModel().getSelectedItem() == null ||
+                    getData.path == "") {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Алдааны мэдэгдэл");
+                alert.setHeaderText(null);
+                alert.setContentText("Хоосон талбаруудыг бөглөнө үү!");
+                alert.showAndWait();
+            } else {
+                alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Баталгаажуулалт");
+                alert.setHeaderText(null);
+                alert.setContentText("Та " + addProducts_productId.getText() + " дугаартай барааг шинэчлэхдээ итгэлтэй байна уу?");
+                Optional<ButtonType> option = alert.showAndWait();
+                if (option.get().equals(ButtonType.OK)) {
+                    statement = connect.createStatement();
+                    statement.executeUpdate(sql);
+
+                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Мэдэгдэл");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Амжилттай шинэчлэгдлээ.");
+                    alert.showAndWait();
+
+                    addProductsShowListData();
+                    addProductsReset();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void addProductsDelete() {
+        String sql = "DELETE FROM product WHERE product_id = '" + addProducts_productId.getText() + "'";
+
+        connect = Database.connectDB();
+        try {
+            Alert alert;
+            if (addProducts_productId.getText().isEmpty() ||
+                    addProducts_productType.getSelectionModel().getSelectedItem() == null ||
+                    addProducts_brand.getText().isEmpty() ||
+                    addProducts_productName.getText().isEmpty() ||
+                    addProducts_price.getText().isEmpty() ||
+                    addProducts_status.getSelectionModel().getSelectedItem() == null ||
+                    getData.path == "") {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Алдааны мэдэгдэл");
+                alert.setHeaderText(null);
+                alert.setContentText("Хоосон талбаруудыг бөглөнө үү!");
+                alert.showAndWait();
+            } else {
+                alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Баталгаажуулалт");
+                alert.setHeaderText(null);
+                alert.setContentText("Та " + addProducts_productId.getText() + " дугаартай барааг устгахдаа итгэлтэй байна уу?");
+                Optional<ButtonType> option = alert.showAndWait();
+                if (option.get().equals(ButtonType.OK)) {
+                    statement = connect.createStatement();
+                    statement.executeUpdate(sql);
+
+                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Мэдэгдэл");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Амжилттай устгалаа.");
+                    alert.showAndWait();
+
+                    addProductsShowListData();
+                    addProductsReset();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // формыг цэвэрлэх функц
+    public void addProductsReset() {
+        addProducts_productId.setText("");
+        addProducts_productType.getSelectionModel().clearSelection();
+        addProducts_brand.setText("");
+        addProducts_productName.setText("");
+        addProducts_price.setText("");
+        addProducts_status.getSelectionModel().clearSelection();
+        addProducts_imageView.setImage(null);
+        getData.path = "";
+    }
+
+    // Зураг оруулах функц
     public void addProductsImportImage() {
         FileChooser open = new FileChooser();
-        open.setTitle("Open Image File");
+        open.setTitle("Барааны зураг сонгох");
         open.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image File", "*jpg", "*png"));
 
         File file = open.showOpenDialog(main_form.getScene().getWindow());
 
-        if(file != null) {
+        if (file != null) {
             getData.path = file.getAbsolutePath();
 
             image = new Image(file.toURI().toString(), 111, 136, false, true);
             addProducts_imageView.setImage(image);
         }
+    }
+
+    private String[] listType = {"Зууш", "Ундаа", "Десерт", "Хувийн бараа", "Бусад"};
+
+    public void addProductsListType() {
+        List<String> listT = new ArrayList<>();
+
+        for (String data : listType) listT.add(data);
+        ObservableList listData = FXCollections.observableArrayList(listT);
+        addProducts_productType.setItems(listData);
+    }
+
+    private String[] listStatus = {"Боломжтой", "Боломжгүй"};
+
+    public void addProductsListStatus() {
+        List<String> listS = new ArrayList<>();
+
+        for (String data : listStatus) listS.add(data);
+        ObservableList listData = FXCollections.observableArrayList(listS);
+        addProducts_status.setItems(listData);
+    }
+
+    public void addProductsSearch() {
+        FilteredList<productData> filter = new FilteredList<>(addProductsList, e -> true);
+
+        addProducts_search.textProperty().addListener((Observable, oldValue, newValue) -> {
+            filter.setPredicate(predicateProductData -> {
+                if(newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                String searchKey = newValue.toLowerCase();
+                if(predicateProductData.getProductId().toString().contains(searchKey)) {
+                    return true;
+                } else if(predicateProductData.getType().toLowerCase().contains(searchKey)) {
+                    return true;
+                } else if (predicateProductData.getBrand().toLowerCase().contains(searchKey)) {
+                    return true;
+                } else if (predicateProductData.getProductName().toLowerCase().contains(searchKey)) {
+                    return true;
+                } else if (predicateProductData.getPrice().toString().contains(searchKey)) {
+                    return true;
+                } else if (predicateProductData.getStatus().toLowerCase().contains(searchKey)) {
+                    return true;
+                } else return false;
+            });
+        });
+
+        SortedList<productData> sortList = new SortedList<>(filter);
+
+        sortList.comparatorProperty().bind(addProducts_tableView.comparatorProperty());
+        addProducts_tableView.setItems(sortList);
     }
 
     public ObservableList<productData> addProductsListData() {
@@ -225,30 +451,32 @@ public class DashboardController implements Initializable {
         connect = Database.connectDB();
 
         try {
+            assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
             productData prodD;
 
-            while(result.next()) {
+            while (result.next()) {
                 prodD = new productData(result.getInt("product_id"),
-                                        result.getString("type"),
-                                        result.getString("brand"),
-                                        result.getString("productName"),
-                                        result.getDouble("price"),
-                                        result.getString("status"),
-                                        result.getString("image"),
-                                        result.getDate("date"));
+                        result.getString("type"),
+                        result.getString("brand"),
+                        result.getString("productName"),
+                        result.getDouble("price"),
+                        result.getString("status"),
+                        result.getString("image"),
+                        result.getDate("date"));
 
                 productList.add(prodD);
             }
-        } catch(Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         return productList;
     }
 
     private ObservableList<productData> addProductsList;
+
     public void addProductsShowListData() {
         addProductsList = addProductsListData();
 
@@ -262,9 +490,25 @@ public class DashboardController implements Initializable {
         addProducts_tableView.setItems(addProductsList);
     }
 
+    public void addProductsSelect() {
+        productData prodD = addProducts_tableView.getSelectionModel().getSelectedItem();
+        int num = addProducts_tableView.getSelectionModel().getSelectedIndex();
 
-    public void switchForm(ActionEvent event ) {
-        if(event.getSource() == home_btn) {
+        if ((num - 1) < -1) return;
+
+        addProducts_productId.setText(String.valueOf(prodD.getProductId()));
+        addProducts_brand.setText(prodD.getBrand());
+        addProducts_productName.setText(prodD.getProductName());
+        addProducts_price.setText(String.valueOf(prodD.getPrice()));
+
+        String uri = "file: " + prodD.getImage();
+        image = new Image(uri, 111, 136, false, true);
+        addProducts_imageView.setImage(image);
+        getData.path = prodD.getImage();
+    }
+
+    public void switchForm(ActionEvent event) {
+        if (event.getSource() == home_btn) {
             home_form.setVisible(true);
             addProducts_form.setVisible(false);
             orders_form.setVisible(false);
@@ -272,8 +516,7 @@ public class DashboardController implements Initializable {
             home_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
             addProducts_btn.setStyle("-fx-background-color: transparent");
             orders_btn.setStyle("-fx-background-color: transparent");
-        }
-        else if(event.getSource() == addProducts_btn) {
+        } else if (event.getSource() == addProducts_btn) {
             home_form.setVisible(false);
             addProducts_form.setVisible(true);
             orders_form.setVisible(false);
@@ -283,9 +526,11 @@ public class DashboardController implements Initializable {
             orders_btn.setStyle("-fx-background-color: transparent");
 
             addProductsShowListData();
+            addProductsListStatus();
+            addProductsListType();
+            addProductsSearch();
 
-        }
-        else if(event.getSource() == orders_btn) {
+        } else if (event.getSource() == orders_btn) {
             home_form.setVisible(false);
             addProducts_form.setVisible(false);
             orders_form.setVisible(true);
@@ -302,17 +547,17 @@ public class DashboardController implements Initializable {
     public void logout() {
         try {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Баталгаажуулах мэдэгдэл");
+            alert.setTitle("Баталгаажуулалт");
             alert.setHeaderText(null);
             alert.setContentText("Та гарахдаа итгэлтэй байна уу?");
             Optional<ButtonType> option = alert.showAndWait();
 
-            if(option.get().equals(ButtonType.OK)) {
+            if (option.get().equals(ButtonType.OK)) {
                 // gol formoo hide hiih
                 logout.getScene().getWindow().hide();
 
                 // login form oo holboh
-                Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
+                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Login.fxml")));
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
 
@@ -337,23 +582,25 @@ public class DashboardController implements Initializable {
 
             } else return;
 
-        } catch(Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
     public void minimize() {
-        Stage stage = (Stage)main_form.getScene().getWindow();
+        Stage stage = (Stage) main_form.getScene().getWindow();
         stage.setIconified(true);
     }
 
     public void close() {
         System.exit(0);
     }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
         // TableView deer bga data g haruulah
         addProductsShowListData();
+        addProductsListStatus();
+        addProductsListType();
     }
 }
