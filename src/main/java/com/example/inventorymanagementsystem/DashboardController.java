@@ -145,19 +145,19 @@ public class DashboardController implements Initializable {
     private Button orders_btn;
 
     @FXML
-    private TableColumn<?, ?> orders_col_brand;
+    private TableColumn<customerData, String> orders_col_brand;
 
     @FXML
-    private TableColumn<?, ?> orders_col_price;
+    private TableColumn<customerData, String> orders_col_price;
 
     @FXML
-    private TableColumn<?, ?> orders_col_productName;
+    private TableColumn<customerData, String> orders_col_productName;
 
     @FXML
-    private TableColumn<?, ?> orders_col_quantity;
+    private TableColumn<customerData, String> orders_col_quantity;
 
     @FXML
-    private TableColumn<?, ?> orders_col_type;
+    private TableColumn<customerData, String> orders_col_type;
 
     @FXML
     private AnchorPane orders_form;
@@ -172,7 +172,7 @@ public class DashboardController implements Initializable {
     private ComboBox<?> orders_productType;
 
     @FXML
-    private Spinner<?> orders_quantity;
+    private Spinner<Integer> orders_quantity;
 
     @FXML
     private Button orders_receiptBtn;
@@ -181,7 +181,7 @@ public class DashboardController implements Initializable {
     private Button orders_resetBtn;
 
     @FXML
-    private TableView<?> orders_tableView;
+    private TableView<customerData> orders_tableView;
 
     @FXML
     private Label orders_total;
@@ -508,6 +508,273 @@ public class DashboardController implements Initializable {
         getData.path = prodD.getImage();
     }
 
+    public void ordersAdd() {
+
+        customerId();
+
+        String sql = "INSERT INTO customer (customer_id, type, brand, productName, quantity, price, date)"
+                + "VALUES(?,?,?,?,?,?,?)";
+
+        connect = Database.connectDB();
+
+
+        try {
+
+            String checkData = "SELECT * FROM product WHERE productName = '"
+                    +orders_productName.getSelectionModel().getSelectedItem()+"'";
+
+            double priceData = 0;
+
+            statement = connect.createStatement();
+            result = statement.executeQuery(checkData);
+
+
+            if(result.next()) {
+                priceData = result.getDouble("price");
+            }
+
+            double totalPData = (priceData * qty);
+
+            Alert alert;
+
+            if(orders_productType.getSelectionModel().getSelectedItem() == null
+                    || (String)orders_brand.getSelectionModel().getSelectedItem() == null
+                    || (String)orders_productName.getSelectionModel().getSelectedItem() == null
+                    || totalPData == 0) {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Алдааны мэдэгдэл");
+                alert.setHeaderText(null);
+                alert.setContentText("Та эхлээд бараагаа сонгоно уу.");
+                alert.showAndWait();
+            } else {
+                prepare = connect.prepareStatement(sql);
+                prepare.setString(1, String.valueOf(customerid));
+                prepare.setString(2, (String)orders_productType.getSelectionModel().getSelectedItem());
+                prepare.setString(3, (String)orders_brand.getSelectionModel().getSelectedItem());
+                prepare.setString(4, (String)orders_productName.getSelectionModel().getSelectedItem());
+                prepare.setString(5, String.valueOf(qty));
+
+
+
+                prepare.setString(6, String.valueOf(totalPData));
+
+                Date date = new Date();
+                java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+                prepare.setString(7, String.valueOf(sqlDate));
+
+                prepare.executeUpdate();
+
+                ordersDisplayTotal();
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private double totalP;
+
+    public void ordersDisplayTotal() {
+        customerId();
+
+        String sql = "SELECT SUM(price) FROM customer WHERE customer_id = '"+customerid+"'";
+
+        connect = Database.connectDB();
+
+        try {
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+
+            while (result.next()) {
+                totalP = result.getDouble("SUM(price)");
+            }
+
+            orders_total.setText(String.valueOf(totalP)+"₮");
+
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private String[] orderListType = {"Зууш", "Ундаа", "Десерт", "Хувийн бараа", "Бусад"};
+    public void ordersListType() {
+        List<String> listT = new ArrayList<>();
+
+        for (String data : orderListType) {
+            listT.add(data);
+        }
+
+        ObservableList listData = FXCollections.observableArrayList(listT);
+        orders_productType.setItems(listData);
+
+        ordersListBrand();
+    }
+
+
+    public void ordersListBrand() {
+
+        String sql = "SELECT brand FROM product WHERE type = '"
+                +orders_productType.getSelectionModel().getSelectedItem()
+                +"' and status = 'Боломжтой'";
+
+        connect = Database.connectDB();
+
+        try {
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            ObservableList listData = FXCollections.observableArrayList();
+
+            while (result.next()) {
+                listData.add(result.getString("brand"));
+            }
+
+            orders_brand.setItems(listData);
+
+            ordersListProductName();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void ordersListProductName() {
+
+        String sql = "SELECT productName FROM product WHERE brand = '"
+                +orders_brand.getSelectionModel().getSelectedItem()+"'";
+
+        connect = Database.connectDB();
+
+        try {
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            ObservableList listData = FXCollections.observableArrayList();
+
+            while(result.next()) {
+                listData.add(result.getString("productName"));
+            }
+
+            orders_productName.setItems(listData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private SpinnerValueFactory<Integer> spinner;
+
+    public void ordersSpinner() {
+        spinner = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0);
+
+        orders_quantity.setValueFactory(spinner);
+    }
+    private int qty;
+    public void ordersShowSpinnerValue() {
+        qty = orders_quantity.getValue();
+    }
+
+
+    public ObservableList<customerData> ordersListData() {
+
+        customerId();
+        ObservableList<customerData> listData = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM customer WHERE customer_id = '"+customerid+"'";
+
+        connect = Database.connectDB();
+
+        try {
+            customerData customerD;
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+                customerD = new customerData(result.getInt("customer_id"),
+                                             result.getString("type"),
+                                             result.getString("brand"),
+                                             result.getString("productName"),
+                                             result.getInt("quantity"),
+                                             result.getDouble("price"),
+                                             result.getDate("date"));
+
+                listData.add(customerD);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listData;
+
+    }
+
+    private ObservableList<customerData> ordersList;
+    public void ordersShowListData() {
+        ordersList = ordersListData();
+
+        orders_col_type.setCellValueFactory(new PropertyValueFactory<>("type"));
+
+        orders_col_brand.setCellValueFactory(new PropertyValueFactory<>("brand"));
+
+        orders_col_productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+
+        orders_col_quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+        orders_col_price.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+
+        orders_tableView.setItems(ordersList);
+    }
+
+
+    private int customerid;
+
+    public void customerId() {
+
+        String customId = "SELECT * FROM customer";
+
+        connect = Database.connectDB();
+
+        try{
+            prepare = connect.prepareStatement(customId);
+            result = prepare.executeQuery();
+
+            int checkId = 0;
+
+            while(result.next()) {
+                // Сүүлийн customer id-г авах
+                customerid = result.getInt("customer_id");
+            }
+
+            String checkData = "SELECT * FROM customer_receipt";
+            result = statement.executeQuery(checkData);
+
+            while(result.next()) {
+                checkId = result.getInt("customer_id");
+            }
+
+            statement = connect.createStatement();
+
+            if(customerid == 0) {
+                customerid+=1;
+            } else if(checkId == customerid) {
+                customerid+=1;
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
     public void switchForm(ActionEvent event) {
         if (event.getSource() == home_btn) {
             home_form.setVisible(true);
@@ -539,6 +806,12 @@ public class DashboardController implements Initializable {
             orders_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
             addProducts_btn.setStyle("-fx-background-color: transparent");
             home_btn.setStyle("-fx-background-color: transparent");
+
+            ordersShowListData();
+            ordersListType();
+            ordersListBrand();
+            ordersListProductName();
+            ordersSpinner();
         }
     }
 
@@ -603,5 +876,11 @@ public class DashboardController implements Initializable {
         addProductsShowListData();
         addProductsListStatus();
         addProductsListType();
+
+        ordersShowListData();
+        ordersListType();
+        ordersListBrand();
+        ordersListProductName();
+        ordersSpinner();
     }
 }
