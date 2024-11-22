@@ -341,12 +341,12 @@
                                           <Font name="Arial" size="20.0" />
                                        </font>
                                     </Label>
-                                    <Label layoutX="36.0" layoutY="273.0" text="Хэмжээ:">
+                                    <Label layoutX="13.0" layoutY="273.0" text="Төлөх дүн:">
                                        <font>
                                           <Font name="Tahoma" size="18.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="orders_amount" layoutX="110.0" layoutY="272.0" styleClass="textfield" stylesheets="@../../../Design/DashboardDesign.css" />
+                                    <TextField fx:id="orders_amount" layoutX="110.0" layoutY="272.0" onAction="#ordersAmount" styleClass="textfield" stylesheets="@../../../Design/DashboardDesign.css" />
                                     <Label layoutX="26.0" layoutY="313.0" text="Үлдэгдэл:">
                                        <font>
                                           <Font size="18.0" />

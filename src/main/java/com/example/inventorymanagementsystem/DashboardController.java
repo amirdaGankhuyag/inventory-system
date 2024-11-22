@@ -564,6 +564,7 @@ public class DashboardController implements Initializable {
 
                 prepare.executeUpdate();
 
+                ordersShowListData();
                 ordersDisplayTotal();
             }
 
@@ -571,6 +572,81 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
 
+    }
+
+    public void ordersPay() {
+        customerId();
+        String sql = "INSERT INTO customer_receipt (customer_id, total, date) WHERE customer_id = '"+customerid+"'";
+
+        connect = Database.connectDB();
+
+        try {
+            Alert alert;
+
+            if(totalP > 0) {
+
+                alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Баталгаажуулах мэдэгдэл");
+                alert.setHeaderText(null);
+                alert.setContentText("Та итгэлтэй байна уу?");
+                Optional<ButtonType> option = alert.showAndWait();
+
+                if (option.get().equals(ButtonType.OK)) {
+                    prepare = connect.prepareStatement(sql);
+                    prepare.setString(1,String.valueOf(customerid));
+                    prepare.setString(2,String.valueOf(totalP));
+
+                    Date date = new Date();
+                    java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+                    prepare.setString(3, String.valueOf(sqlDate));
+
+                    prepare.executeUpdate();
+
+                } else return;
+            } else {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Алдааны мэдэгдэл");
+                alert.setHeaderText(null);
+                alert.setContentText("Invalid :>");
+                alert.showAndWait();
+            }
+
+
+
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    private double amountP;
+    private double balanceP;
+    public void ordersAmount() {
+        Alert alert;
+
+        amountP = Double.parseDouble(orders_amount.getText());
+
+        if(totalP > 0) {
+            if(amountP >= totalP) {
+                balanceP = (amountP - totalP);
+
+                orders_balance.setText(String.valueOf(balanceP) +"₮");
+
+
+            } else {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(null);
+                alert.setContentText("Invalid :>3");
+                alert.showAndWait();
+
+                orders_amount.setText("");
+            }
+        } else {
+            alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(null);
+            alert.setContentText("Invalid :>");
+            alert.showAndWait();
+        }
     }
 
     private double totalP;
@@ -729,6 +805,7 @@ public class DashboardController implements Initializable {
         orders_col_price.setCellValueFactory(new PropertyValueFactory<>("price"));
 
 
+        ordersDisplayTotal();
         orders_tableView.setItems(ordersList);
     }
 
