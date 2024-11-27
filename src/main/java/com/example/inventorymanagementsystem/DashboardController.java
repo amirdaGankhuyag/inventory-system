@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -21,6 +22,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 import javax.xml.transform.Result;
 import java.io.File;
@@ -200,6 +205,113 @@ public class DashboardController implements Initializable {
 
     private Image image;
 
+    public void homeDisplayTotalOrders() {
+        Date date = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+        String sql = "SELECT COUNT(id) FROM customer WHERE date = '" + sqlDate + "'";
+        connect = Database.connectDB();
+
+        int countOrders = 0;
+
+        try {
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+                countOrders = result.getInt("COUNT(id)");
+            }
+
+            home_numberOrder.setText(String.valueOf(countOrders));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void homeTotalIncome() {
+        String sql = "SELECT SUM(total) FROM customer_receipt";
+        connect = Database.connectDB();
+
+        double totalIncome = 0;
+
+        try {
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+                totalIncome = result.getDouble("SUM(total)");
+            }
+
+            home_totalIncome.setText(String.valueOf(totalIncome) + "₮");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void homeAvailableProduncts() {
+        String sql = "SELECT COUNT(id) FROM product WHERE status = 'Боломжтой'";
+        connect = Database.connectDB();
+
+        int countAP = 0;
+
+        try {
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+                countAP = result.getInt("COUNT(id)");
+            }
+
+            home_availableProducts.setText(String.valueOf(countAP));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void homeIncomeChart() {
+        home_incomeChart.getData().clear();
+
+        String sql = "SELECT date, SUM(total) FROM customer_receipt GROUP BY TIMESTAMP(date) ASC LIMIT 6";
+        connect = Database.connectDB();
+
+        try {
+            XYChart.Series chart = new XYChart.Series();
+
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+                chart.getData().add(new XYChart.Data(result.getString(1), result.getInt(2)));
+            }
+
+            home_incomeChart.getData().add(chart);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void homeOrdersChart(){
+        home_orderChart.getData().clear();
+        String sql = "SELECT date, COUNT(id) FROM customer GROUP BY date ORDER BY TIMESTAMP(date) ASC LIMIT 5";
+        connect = Database.connectDB();
+
+        try {
+            XYChart.Series chart = new XYChart.Series();
+
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()){
+                chart.getData().add(new XYChart.Data(result.getString(1), result.getInt(2)));
+            }
+
+            home_orderChart.getData().add(chart);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     // Database-д бараа нэмэх функц
     public void addProductsAdd() {
         String sql = "INSERT INTO product (product_id, type, brand, productName, price, status, image, date) "
@@ -261,7 +373,7 @@ public class DashboardController implements Initializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -318,7 +430,7 @@ public class DashboardController implements Initializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -361,7 +473,7 @@ public class DashboardController implements Initializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -394,6 +506,7 @@ public class DashboardController implements Initializable {
     }
 
     private String[] listType = {"Зууш", "Ундаа", "Десерт", "Хувийн бараа", "Бусад"};
+
     public void addProductsListType() {
         List<String> listT = new ArrayList<>();
 
@@ -403,6 +516,7 @@ public class DashboardController implements Initializable {
     }
 
     private String[] listStatus = {"Боломжтой", "Боломжгүй"};
+
     public void addProductsListStatus() {
         List<String> listS = new ArrayList<>();
 
@@ -416,13 +530,13 @@ public class DashboardController implements Initializable {
 
         addProducts_search.textProperty().addListener((Observable, oldValue, newValue) -> {
             filter.setPredicate(predicateProductData -> {
-                if(newValue == null || newValue.isEmpty()) {
+                if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
                 String searchKey = newValue.toLowerCase();
-                if(predicateProductData.getProductId().toString().contains(searchKey)) {
+                if (predicateProductData.getProductId().toString().contains(searchKey)) {
                     return true;
-                } else if(predicateProductData.getType().toLowerCase().contains(searchKey)) {
+                } else if (predicateProductData.getType().toLowerCase().contains(searchKey)) {
                     return true;
                 } else if (predicateProductData.getBrand().toLowerCase().contains(searchKey)) {
                     return true;
@@ -468,7 +582,7 @@ public class DashboardController implements Initializable {
                 productList.add(prodD);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         return productList;
     }
@@ -521,7 +635,7 @@ public class DashboardController implements Initializable {
         try {
 
             String checkData = "SELECT * FROM product WHERE productName = '"
-                    +orders_productName.getSelectionModel().getSelectedItem()+"'";
+                    + orders_productName.getSelectionModel().getSelectedItem() + "'";
 
             double priceData = 0;
 
@@ -529,7 +643,7 @@ public class DashboardController implements Initializable {
             result = statement.executeQuery(checkData);
 
 
-            if(result.next()) {
+            if (result.next()) {
                 priceData = result.getDouble("price");
             }
 
@@ -537,9 +651,9 @@ public class DashboardController implements Initializable {
 
             Alert alert;
 
-            if(orders_productType.getSelectionModel().getSelectedItem() == null
-                    || (String)orders_brand.getSelectionModel().getSelectedItem() == null
-                    || (String)orders_productName.getSelectionModel().getSelectedItem() == null
+            if (orders_productType.getSelectionModel().getSelectedItem() == null
+                    || (String) orders_brand.getSelectionModel().getSelectedItem() == null
+                    || (String) orders_productName.getSelectionModel().getSelectedItem() == null
                     || totalPData == 0) {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Алдааны мэдэгдэл");
@@ -549,11 +663,10 @@ public class DashboardController implements Initializable {
             } else {
                 prepare = connect.prepareStatement(sql);
                 prepare.setString(1, String.valueOf(customerid));
-                prepare.setString(2, (String)orders_productType.getSelectionModel().getSelectedItem());
-                prepare.setString(3, (String)orders_brand.getSelectionModel().getSelectedItem());
-                prepare.setString(4, (String)orders_productName.getSelectionModel().getSelectedItem());
+                prepare.setString(2, (String) orders_productType.getSelectionModel().getSelectedItem());
+                prepare.setString(3, (String) orders_brand.getSelectionModel().getSelectedItem());
+                prepare.setString(4, (String) orders_productName.getSelectionModel().getSelectedItem());
                 prepare.setString(5, String.valueOf(qty));
-
 
 
                 prepare.setString(6, String.valueOf(totalPData));
@@ -568,7 +681,7 @@ public class DashboardController implements Initializable {
                 ordersDisplayTotal();
             }
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -576,15 +689,15 @@ public class DashboardController implements Initializable {
 
     public void ordersPay() {
         customerId();
-        String sql = "INSERT INTO customer_receipt (customer_id, total, date) WHERE customer_id = '"+customerid+"'";
+        String sql = "INSERT INTO customer_receipt (customer_id, total, amount, balance date) " +
+                "VALUES (?,?,?,?,?)";
 
         connect = Database.connectDB();
 
         try {
             Alert alert;
 
-            if(totalP > 0) {
-
+            if (totalP > 0 || orders_amount.getText().isEmpty() || amountP == 0) {
                 alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Баталгаажуулах мэдэгдэл");
                 alert.setHeaderText(null);
@@ -593,15 +706,29 @@ public class DashboardController implements Initializable {
 
                 if (option.get().equals(ButtonType.OK)) {
                     prepare = connect.prepareStatement(sql);
-                    prepare.setString(1,String.valueOf(customerid));
-                    prepare.setString(2,String.valueOf(totalP));
+                    prepare.setString(1, String.valueOf(customerid));
+                    prepare.setString(2, String.valueOf(totalP));
+                    prepare.setString(3, String.valueOf(amountP));
+                    prepare.setString(4, String.valueOf(balanceP));
 
                     Date date = new Date();
                     java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-                    prepare.setString(3, String.valueOf(sqlDate));
+                    prepare.setString(5, String.valueOf(sqlDate));
 
                     prepare.executeUpdate();
 
+                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Мэдэгдэл");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Амжилттай.");
+                    alert.showAndWait();
+
+
+                    totalP = 0;
+                    balanceP = 0;
+                    amountP = 0;
+
+                    orders_balance.setText("0.0₮");
                 } else return;
             } else {
                 alert = new Alert(Alert.AlertType.ERROR);
@@ -610,36 +737,88 @@ public class DashboardController implements Initializable {
                 alert.setContentText("Invalid :>");
                 alert.showAndWait();
             }
-
-
-
-
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
+    public void orderReceipt() {
+        HashMap hash = new HashMap();
+        hash.put("inventoryP", customerid);
+        try {
+
+            JasperDesign jDesign = JRXmlLoader.load("C:\\Users\\Dell\\Documents\\24-25 FALL\\Software Development\\Lab\\InventoryManagementSystem\\src\\main\\java\\com\\example\\inventorymanagementsystem\\report.jrxml");
+            JasperReport jReport = JasperCompileManager.compileReport(jDesign);
+            JasperPrint jPrint = JasperFillManager.fillReport(jReport, hash, connect);
+
+            JasperViewer.viewReport(jPrint, false);
+
+        } catch (JRException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void ordersReset() {
+        customerId();
+        String sql = "DELETE FROM customer WHERE customer_id = '" + customerid + "'";
+
+        connect = Database.connectDB();
+        try {
+            if (!orders_tableView.getItems().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Баталгаажуулах мэдэгдэл");
+                alert.setHeaderText(null);
+                alert.setContentText("Та дахин тохируулахдаа итгэлтэй байна уу?");
+                Optional<ButtonType> option = alert.showAndWait();
+
+                if (option.get().equals(ButtonType.OK)) {
+                    statement = connect.createStatement();
+                    statement.executeUpdate(sql);
+
+                    ordersShowListData();
+
+                    balanceP = 0;
+                    amountP = 0;
+
+                    orders_balance.setText("0.0₮");
+                    orders_total.setText("0.0₮");
+                    orders_amount.setText("0.0₮");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private double amountP;
     private double balanceP;
+
     public void ordersAmount() {
         Alert alert;
 
         amountP = Double.parseDouble(orders_amount.getText());
 
-        if(totalP > 0) {
-            if(amountP >= totalP) {
-                balanceP = (amountP - totalP);
+        if (!orders_amount.getText().isEmpty()) {
 
-                orders_balance.setText(String.valueOf(balanceP) +"₮");
+            if (totalP > 0) {
+                if (amountP >= totalP) {
+                    balanceP = (amountP - totalP);
 
+                    orders_balance.setText(String.valueOf(balanceP) + "₮");
 
+                } else {
+                    alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setHeaderText(null);
+                    alert.setContentText("Invalid :3");
+                    alert.showAndWait();
+
+                    orders_amount.setText("");
+                }
             } else {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText(null);
-                alert.setContentText("Invalid :>3");
+                alert.setContentText("Invalid :>");
                 alert.showAndWait();
-
-                orders_amount.setText("");
             }
         } else {
             alert = new Alert(Alert.AlertType.ERROR);
@@ -654,7 +833,7 @@ public class DashboardController implements Initializable {
     public void ordersDisplayTotal() {
         customerId();
 
-        String sql = "SELECT SUM(price) FROM customer WHERE customer_id = '"+customerid+"'";
+        String sql = "SELECT SUM(price) FROM customer WHERE customer_id = '" + customerid + "'";
 
         connect = Database.connectDB();
 
@@ -667,10 +846,10 @@ public class DashboardController implements Initializable {
                 totalP = result.getDouble("SUM(price)");
             }
 
-            orders_total.setText(String.valueOf(totalP)+"₮");
+            orders_total.setText(String.valueOf(totalP) + "₮");
 
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -678,6 +857,7 @@ public class DashboardController implements Initializable {
 
 
     private String[] orderListType = {"Зууш", "Ундаа", "Десерт", "Хувийн бараа", "Бусад"};
+
     public void ordersListType() {
         List<String> listT = new ArrayList<>();
 
@@ -695,8 +875,8 @@ public class DashboardController implements Initializable {
     public void ordersListBrand() {
 
         String sql = "SELECT brand FROM product WHERE type = '"
-                +orders_productType.getSelectionModel().getSelectedItem()
-                +"' and status = 'Боломжтой'";
+                + orders_productType.getSelectionModel().getSelectedItem()
+                + "' and status = 'Боломжтой' GROUP BY brand";
 
         connect = Database.connectDB();
 
@@ -714,7 +894,7 @@ public class DashboardController implements Initializable {
 
             ordersListProductName();
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -723,7 +903,7 @@ public class DashboardController implements Initializable {
     public void ordersListProductName() {
 
         String sql = "SELECT productName FROM product WHERE brand = '"
-                +orders_brand.getSelectionModel().getSelectedItem()+"'";
+                + orders_brand.getSelectionModel().getSelectedItem() + "'";
 
         connect = Database.connectDB();
 
@@ -733,7 +913,7 @@ public class DashboardController implements Initializable {
 
             ObservableList listData = FXCollections.observableArrayList();
 
-            while(result.next()) {
+            while (result.next()) {
                 listData.add(result.getString("productName"));
             }
 
@@ -752,7 +932,9 @@ public class DashboardController implements Initializable {
 
         orders_quantity.setValueFactory(spinner);
     }
+
     private int qty;
+
     public void ordersShowSpinnerValue() {
         qty = orders_quantity.getValue();
     }
@@ -762,23 +944,24 @@ public class DashboardController implements Initializable {
 
         customerId();
         ObservableList<customerData> listData = FXCollections.observableArrayList();
-        String sql = "SELECT * FROM customer WHERE customer_id = '"+customerid+"'";
+        String sql = "SELECT * FROM customer WHERE customer_id = '" + customerid + "'";
 
         connect = Database.connectDB();
 
         try {
             customerData customerD;
+            assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
             while (result.next()) {
                 customerD = new customerData(result.getInt("customer_id"),
-                                             result.getString("type"),
-                                             result.getString("brand"),
-                                             result.getString("productName"),
-                                             result.getInt("quantity"),
-                                             result.getDouble("price"),
-                                             result.getDate("date"));
+                        result.getString("type"),
+                        result.getString("brand"),
+                        result.getString("productName"),
+                        result.getInt("quantity"),
+                        result.getDouble("price"),
+                        result.getDate("date"));
 
                 listData.add(customerD);
             }
@@ -787,10 +970,10 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
         return listData;
-
     }
 
     private ObservableList<customerData> ordersList;
+
     public void ordersShowListData() {
         ordersList = ordersListData();
 
@@ -818,13 +1001,14 @@ public class DashboardController implements Initializable {
 
         connect = Database.connectDB();
 
-        try{
+        try {
+            assert connect != null;
             prepare = connect.prepareStatement(customId);
             result = prepare.executeQuery();
 
             int checkId = 0;
 
-            while(result.next()) {
+            while (result.next()) {
                 // Сүүлийн customer id-г авах
                 customerid = result.getInt("customer_id");
             }
@@ -832,24 +1016,23 @@ public class DashboardController implements Initializable {
             String checkData = "SELECT * FROM customer_receipt";
             result = statement.executeQuery(checkData);
 
-            while(result.next()) {
+            while (result.next()) {
                 checkId = result.getInt("customer_id");
             }
 
             statement = connect.createStatement();
 
-            if(customerid == 0) {
-                customerid+=1;
-            } else if(checkId == customerid) {
-                customerid+=1;
+            if (customerid == 0) {
+                customerid += 1;
+            } else if (checkId == customerid) {
+                customerid += 1;
             }
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
 
 
     public void switchForm(ActionEvent event) {
@@ -861,6 +1044,14 @@ public class DashboardController implements Initializable {
             home_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
             addProducts_btn.setStyle("-fx-background-color: transparent");
             orders_btn.setStyle("-fx-background-color: transparent");
+
+            homeDisplayTotalOrders();
+            homeTotalIncome();
+            homeAvailableProduncts();
+
+            homeIncomeChart();
+            homeOrdersChart();
+
         } else if (event.getSource() == addProducts_btn) {
             home_form.setVisible(false);
             addProducts_form.setVisible(true);
@@ -890,6 +1081,10 @@ public class DashboardController implements Initializable {
             ordersListProductName();
             ordersSpinner();
         }
+    }
+
+    public void defaultNav(){
+        home_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
     }
 
     private double x = 0;
@@ -934,8 +1129,12 @@ public class DashboardController implements Initializable {
             } else return;
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    public void displayUsername(){
+        username.setText(getData.username);
     }
 
     public void minimize() {
@@ -949,6 +1148,16 @@ public class DashboardController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        defaultNav();
+        displayUsername();
+
+        homeDisplayTotalOrders();
+        homeTotalIncome();
+        homeAvailableProduncts();
+
+        homeIncomeChart();
+        homeOrdersChart();
+
         // TableView deer bga data g haruulah
         addProductsShowListData();
         addProductsListStatus();

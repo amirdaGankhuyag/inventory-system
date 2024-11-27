@@ -105,7 +105,7 @@
                <center>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <children>
-                        <AnchorPane fx:id="home_form" layoutX="31.0" layoutY="88.0" prefHeight="554.4" prefWidth="892.8" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane fx:id="home_form" layoutX="31.0" layoutY="88.0" prefHeight="554.4" prefWidth="892.8" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="154.0" prefWidth="862.0" stylesheets="@../../../Design/DashboardDesign.css">
                                  <styleClass>
@@ -282,7 +282,7 @@
                               </AnchorPane>
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="orders_form" prefHeight="555.0" prefWidth="893.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane fx:id="orders_form" prefHeight="555.0" prefWidth="893.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane layoutX="14.0" layoutY="15.0" prefHeight="525.0" prefWidth="552.0" stylesheets="@../../../Design/DashboardDesign.css">
                                  <styleClass>
@@ -358,9 +358,9 @@
                                        </font>
                                     </Label>
                                     <Button fx:id="orders_addBtn" layoutX="108.0" layoutY="174.0" mnemonicParsing="false" onAction="#ordersAdd" prefHeight="38.0" prefWidth="80.0" styleClass="add-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Нэмэх" />
-                                    <Button fx:id="orders_payBtn" layoutX="177.0" layoutY="374.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" styleClass="pay-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Төлөх" />
-                                    <Button fx:id="orders_receiptBtn" layoutX="39.0" layoutY="374.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" styleClass="receipt-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Баримт" />
-                                    <Button fx:id="orders_resetBtn" layoutX="39.0" layoutY="431.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="80.0" styleClass="clear-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Арилгах" />
+                                    <Button fx:id="orders_payBtn" layoutX="177.0" layoutY="374.0" mnemonicParsing="false" onAction="#ordersPay" prefHeight="38.0" prefWidth="80.0" styleClass="pay-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Төлөх" />
+                                    <Button fx:id="orders_receiptBtn" layoutX="39.0" layoutY="374.0" mnemonicParsing="false" onAction="#orderReceipt" prefHeight="38.0" prefWidth="80.0" styleClass="receipt-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Баримт" />
+                                    <Button fx:id="orders_resetBtn" layoutX="39.0" layoutY="431.0" mnemonicParsing="false" onAction="#ordersReset" prefHeight="38.0" prefWidth="80.0" styleClass="clear-btn" stylesheets="@../../../Design/DashboardDesign.css" text="Арилгах" />
                                  </children>
                               </AnchorPane>
                            </children>

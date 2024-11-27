@@ -65,6 +65,7 @@ public class MainController {
 
             // амжилттай нэвтэрвэл
             if(result.next()) {
+                getData.username = username.getText();
                 // username, password correct bol dashboard form ruu shiljih
                 alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Мэдэгдэл");
