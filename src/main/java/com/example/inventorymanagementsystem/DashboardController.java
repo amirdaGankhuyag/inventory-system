@@ -87,7 +87,7 @@ public class DashboardController implements Initializable {
     private TextField addProducts_productName;
 
     @FXML
-    private ComboBox<?> addProducts_productType;
+    private ComboBox<String> addProducts_productType;
 
     @FXML
     private Button addProducts_resetBtn;
@@ -96,7 +96,7 @@ public class DashboardController implements Initializable {
     private TextField addProducts_search;
 
     @FXML
-    private ComboBox<?> addProducts_status;
+    private ComboBox<String> addProducts_status;
 
     @FXML
     private TableView<productData> addProducts_tableView;
@@ -144,7 +144,7 @@ public class DashboardController implements Initializable {
     private Label orders_balance;
 
     @FXML
-    private ComboBox<?> orders_brand;
+    private ComboBox<String> orders_brand;
 
     @FXML
     private Button orders_btn;
@@ -171,10 +171,10 @@ public class DashboardController implements Initializable {
     private Button orders_payBtn;
 
     @FXML
-    private ComboBox<?> orders_productName;
+    private ComboBox<String> orders_productName;
 
     @FXML
-    private ComboBox<?> orders_productType;
+    private ComboBox<String> orders_productType;
 
     @FXML
     private Spinner<Integer> orders_quantity;
@@ -290,7 +290,7 @@ public class DashboardController implements Initializable {
         }
     }
 
-    public void homeOrdersChart(){
+    public void homeOrdersChart() {
         home_orderChart.getData().clear();
         String sql = "SELECT date, COUNT(id) FROM customer GROUP BY date ORDER BY TIMESTAMP(date) ASC LIMIT 5";
         connect = Database.connectDB();
@@ -301,7 +301,7 @@ public class DashboardController implements Initializable {
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
-            while (result.next()){
+            while (result.next()) {
                 chart.getData().add(new XYChart.Data(result.getString(1), result.getInt(2)));
             }
 
@@ -327,7 +327,7 @@ public class DashboardController implements Initializable {
                     addProducts_productName.getText().isEmpty() ||
                     addProducts_price.getText().isEmpty() ||
                     addProducts_status.getSelectionModel().getSelectedItem() == null ||
-                    getData.path == "") {
+                    ListData.path == "") {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Алдааны мэдэгдэл");
                 alert.setHeaderText(null);
@@ -353,13 +353,13 @@ public class DashboardController implements Initializable {
                     assert connect != null;
                     prepare = connect.prepareStatement(sql);
                     prepare.setString(1, addProducts_productId.getText());
-                    prepare.setString(2, (String) addProducts_productType.getSelectionModel().getSelectedItem());
+                    prepare.setString(2, addProducts_productType.getSelectionModel().getSelectedItem());
                     prepare.setString(3, addProducts_brand.getText());
                     prepare.setString(4, addProducts_productName.getText());
                     prepare.setString(5, addProducts_price.getText());
-                    prepare.setString(6, (String) addProducts_status.getSelectionModel().getSelectedItem());
+                    prepare.setString(6, addProducts_status.getSelectionModel().getSelectedItem());
 
-                    String uri = getData.path;
+                    String uri = ListData.path;
                     uri = uri.replace("\\", "\\\\");
                     prepare.setString(7, uri);
 
@@ -378,7 +378,7 @@ public class DashboardController implements Initializable {
     }
 
     public void addProductsUpdate() {
-        String uri = getData.path;
+        String uri = ListData.path;
         uri = uri.replace("\\", "\\\\");
 
         Date date = new Date();
@@ -403,7 +403,7 @@ public class DashboardController implements Initializable {
                     addProducts_productName.getText().isEmpty() ||
                     addProducts_price.getText().isEmpty() ||
                     addProducts_status.getSelectionModel().getSelectedItem() == null ||
-                    getData.path == "") {
+                    ListData.path == "") {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Алдааны мэдэгдэл");
                 alert.setHeaderText(null);
@@ -446,7 +446,7 @@ public class DashboardController implements Initializable {
                     addProducts_productName.getText().isEmpty() ||
                     addProducts_price.getText().isEmpty() ||
                     addProducts_status.getSelectionModel().getSelectedItem() == null ||
-                    getData.path == "") {
+                    ListData.path == "") {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Алдааны мэдэгдэл");
                 alert.setHeaderText(null);
@@ -485,11 +485,12 @@ public class DashboardController implements Initializable {
         addProducts_productName.setText("");
         addProducts_price.setText("");
         addProducts_status.getSelectionModel().clearSelection();
+
+        ListData.path = "";
         addProducts_imageView.setImage(null);
-        getData.path = "";
     }
 
-    // Зураг оруулах функц
+    // Зураг оруулж ирэх функц
     public void addProductsImportImage() {
         FileChooser open = new FileChooser();
         open.setTitle("Барааны зураг сонгох");
@@ -498,29 +499,25 @@ public class DashboardController implements Initializable {
         File file = open.showOpenDialog(main_form.getScene().getWindow());
 
         if (file != null) {
-            getData.path = file.getAbsolutePath();
+            ListData.path = file.getAbsolutePath();
 
             image = new Image(file.toURI().toString(), 111, 136, false, true);
             addProducts_imageView.setImage(image);
         }
     }
 
-    private String[] listType = {"Зууш", "Ундаа", "Десерт", "Хувийн бараа", "Бусад"};
-
     public void addProductsListType() {
         List<String> listT = new ArrayList<>();
 
-        for (String data : listType) listT.add(data);
+        for (String data : ListData.listType) listT.add(data);
         ObservableList listData = FXCollections.observableArrayList(listT);
         addProducts_productType.setItems(listData);
     }
 
-    private String[] listStatus = {"Боломжтой", "Боломжгүй"};
-
     public void addProductsListStatus() {
         List<String> listS = new ArrayList<>();
 
-        for (String data : listStatus) listS.add(data);
+        for (String data : ListData.listStatus) listS.add(data);
         ObservableList listData = FXCollections.observableArrayList(listS);
         addProducts_status.setItems(listData);
     }
@@ -556,6 +553,7 @@ public class DashboardController implements Initializable {
         addProducts_tableView.setItems(sortList);
     }
 
+    // Бараа хүснэгтээс мэдээллүүдийг авч харгалзах загвар өгөгдөлд олгох
     public ObservableList<productData> addProductsListData() {
         ObservableList<productData> productList = FXCollections.observableArrayList();
 
@@ -611,15 +609,16 @@ public class DashboardController implements Initializable {
         if ((num - 1) < -1) return;
 
         addProducts_productId.setText(String.valueOf(prodD.getProductId()));
+        addProducts_productType.getSelectionModel().select(prodD.getType());
         addProducts_brand.setText(prodD.getBrand());
         addProducts_productName.setText(prodD.getProductName());
+        addProducts_status.getSelectionModel().select(prodD.getStatus());
         addProducts_price.setText(String.valueOf(prodD.getPrice()));
-        // dropdown fill хийх хэсэг нэмэх
 
         String uri = "file: " + prodD.getImage();
         image = new Image(uri, 111, 136, false, true);
         addProducts_imageView.setImage(image);
-        getData.path = prodD.getImage();
+        ListData.path = prodD.getImage();
     }
 
     public void ordersAdd() {
@@ -652,8 +651,8 @@ public class DashboardController implements Initializable {
             Alert alert;
 
             if (orders_productType.getSelectionModel().getSelectedItem() == null
-                    || (String) orders_brand.getSelectionModel().getSelectedItem() == null
-                    || (String) orders_productName.getSelectionModel().getSelectedItem() == null
+                    || orders_brand.getSelectionModel().getSelectedItem() == null
+                    || orders_productName.getSelectionModel().getSelectedItem() == null
                     || totalPData == 0) {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Алдааны мэдэгдэл");
@@ -662,10 +661,10 @@ public class DashboardController implements Initializable {
                 alert.showAndWait();
             } else {
                 prepare = connect.prepareStatement(sql);
-                prepare.setString(1, String.valueOf(customerid));
-                prepare.setString(2, (String) orders_productType.getSelectionModel().getSelectedItem());
-                prepare.setString(3, (String) orders_brand.getSelectionModel().getSelectedItem());
-                prepare.setString(4, (String) orders_productName.getSelectionModel().getSelectedItem());
+                prepare.setString(1, String.valueOf(ListData.customerId));
+                prepare.setString(2, orders_productType.getSelectionModel().getSelectedItem());
+                prepare.setString(3, orders_brand.getSelectionModel().getSelectedItem());
+                prepare.setString(4, orders_productName.getSelectionModel().getSelectedItem());
                 prepare.setString(5, String.valueOf(qty));
 
 
@@ -689,7 +688,7 @@ public class DashboardController implements Initializable {
 
     public void ordersPay() {
         customerId();
-        String sql = "INSERT INTO customer_receipt (customer_id, total, amount, balance date) " +
+        String sql = "INSERT INTO customer_receipt (customer_id, total, amount, balance, date) " +
                 "VALUES (?,?,?,?,?)";
 
         connect = Database.connectDB();
@@ -706,7 +705,7 @@ public class DashboardController implements Initializable {
 
                 if (option.get().equals(ButtonType.OK)) {
                     prepare = connect.prepareStatement(sql);
-                    prepare.setString(1, String.valueOf(customerid));
+                    prepare.setString(1, String.valueOf(ListData.customerId));
                     prepare.setString(2, String.valueOf(totalP));
                     prepare.setString(3, String.valueOf(amountP));
                     prepare.setString(4, String.valueOf(balanceP));
@@ -722,7 +721,6 @@ public class DashboardController implements Initializable {
                     alert.setHeaderText(null);
                     alert.setContentText("Амжилттай.");
                     alert.showAndWait();
-
 
                     totalP = 0;
                     balanceP = 0;
@@ -744,7 +742,7 @@ public class DashboardController implements Initializable {
 
     public void orderReceipt() {
         HashMap hash = new HashMap();
-        hash.put("inventoryP", customerid);
+        hash.put("inventoryP", ListData.customerId);
         try {
 
             JasperDesign jDesign = JRXmlLoader.load("C:\\Users\\Dell\\Documents\\24-25 FALL\\Software Development\\Lab\\InventoryManagementSystem\\src\\main\\java\\com\\example\\inventorymanagementsystem\\report.jrxml");
@@ -760,7 +758,7 @@ public class DashboardController implements Initializable {
 
     public void ordersReset() {
         customerId();
-        String sql = "DELETE FROM customer WHERE customer_id = '" + customerid + "'";
+        String sql = "DELETE FROM customer WHERE customer_id = '" + ListData.customerId + "'";
 
         connect = Database.connectDB();
         try {
@@ -833,7 +831,7 @@ public class DashboardController implements Initializable {
     public void ordersDisplayTotal() {
         customerId();
 
-        String sql = "SELECT SUM(price) FROM customer WHERE customer_id = '" + customerid + "'";
+        String sql = "SELECT SUM(price) FROM customer WHERE customer_id = '" + ListData.customerId + "'";
 
         connect = Database.connectDB();
 
@@ -944,7 +942,7 @@ public class DashboardController implements Initializable {
 
         customerId();
         ObservableList<customerData> listData = FXCollections.observableArrayList();
-        String sql = "SELECT * FROM customer WHERE customer_id = '" + customerid + "'";
+        String sql = "SELECT * FROM customer WHERE customer_id = '" + ListData.customerId + "'";
 
         connect = Database.connectDB();
 
@@ -993,8 +991,6 @@ public class DashboardController implements Initializable {
     }
 
 
-    private int customerid;
-
     public void customerId() {
 
         String customId = "SELECT * FROM customer";
@@ -1010,7 +1006,7 @@ public class DashboardController implements Initializable {
 
             while (result.next()) {
                 // Сүүлийн customer id-г авах
-                customerid = result.getInt("customer_id");
+                ListData.customerId = result.getInt("customer_id");
             }
 
             String checkData = "SELECT * FROM customer_receipt";
@@ -1022,10 +1018,10 @@ public class DashboardController implements Initializable {
 
             statement = connect.createStatement();
 
-            if (customerid == 0) {
-                customerid += 1;
-            } else if (checkId == customerid) {
-                customerid += 1;
+            if (ListData.customerId == 0) {
+                ListData.customerId += 1;
+            } else if (checkId == ListData.customerId) {
+                ListData.customerId += 1;
             }
 
         } catch (Exception e) {
@@ -1083,7 +1079,7 @@ public class DashboardController implements Initializable {
         }
     }
 
-    public void defaultNav(){
+    public void defaultNav() {
         home_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
     }
 
@@ -1133,8 +1129,8 @@ public class DashboardController implements Initializable {
         }
     }
 
-    public void displayUsername(){
-        username.setText(getData.username);
+    public void displayUsername() {
+        username.setText(ListData.username);
     }
 
     public void minimize() {

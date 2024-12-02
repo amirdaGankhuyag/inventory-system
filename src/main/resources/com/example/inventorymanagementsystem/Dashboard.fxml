@@ -105,7 +105,7 @@
                <center>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <children>
-                        <AnchorPane fx:id="home_form" layoutX="31.0" layoutY="88.0" prefHeight="554.4" prefWidth="892.8" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane fx:id="home_form" layoutX="31.0" layoutY="88.0" prefHeight="554.4" prefWidth="892.8" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="154.0" prefWidth="862.0" stylesheets="@../../../Design/DashboardDesign.css">
                                  <styleClass>
@@ -200,7 +200,7 @@
                               <Line endX="761.6000366210938" endY="-1.52587890625E-5" layoutX="116.0" layoutY="180.0" startX="-100.0" stroke="#bf6d26" />
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="addProducts_form" layoutX="104.0" layoutY="56.0" prefHeight="555.0" prefWidth="893.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane fx:id="addProducts_form" layoutX="104.0" layoutY="56.0" prefHeight="555.0" prefWidth="893.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane layoutX="14.0" layoutY="18.0" prefHeight="519.0" prefWidth="331.0" stylesheets="@../../../Design/DashboardDesign.css">
                                  <styleClass>
