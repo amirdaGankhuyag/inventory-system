@@ -1,6 +1,6 @@
 <!-- Created with Jaspersoft Studio version 7.0.1.final using JasperReports Library version 7.0.1-573496633c2b4074e32f433154b543003f7d2498  -->
 <jasperReport name="Blank_A4" language="java" columnCount="1" pageWidth="226" pageHeight="425" orientation="Landscape" columnWidth="186" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="66e81c9e-50de-498d-a5cf-80f88ec343a3">
-    <property name="com.jaspersoft.studio.data.sql.tables" value="aW52ZW50b3J5LmN1c3RvbWVyX3JlY2VpcHQgLDE1LDQ2LGFhMGNmNjE0LWNhNDYtNDJmMy05Njc4&#xa;LTMzZDQ3MDNhYTFiNTtpbnZlbnRvcnkuY3VzdG9tZXIgLDE2NiwxNSxmODc2ODliMi1kYzdjLTQw&#xa;YTAtODQxYS1iNDI1YjRjYjgyNWE7"/>
+    <property name="com.jaspersoft.studio.data.sql.tables" value="aW52ZW50b3J5LmN1c3RvbWVyICwxNjYsMTUsZWU4MGNkYzMtZGYzYS00YTFmLTg5MTItYzhiNDYz&#xa;MDI5YTUwO2ludmVudG9yeS5jdXN0b21lcl9yZWNlaXB0ICwxNSw0NixhMTk5MTkxMy0zOWZlLTQ3&#xa;YjMtYWY0My00NjdmNDk3NjRmZmI7"/>
     <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="475"/>
     <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="525"/>
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="inventorySystem"/>
@@ -18,7 +18,7 @@
 	inventory.customer.customer_id,
 	inventory.customer.type,
 	inventory.customer.brand,
-	inventory.customer.`productName`,
+	inventory.customer.product_name,
 	inventory.customer.quantity,
 	inventory.customer.price,
 	inventory.customer.date,
@@ -53,7 +53,7 @@ WHERE
         <property name="com.jaspersoft.studio.field.label" value="brand"/>
         <property name="com.jaspersoft.studio.field.tree.path" value="customer"/>
     </field>
-    <field name="productName" class="java.lang.String">
+    <field name="product_name" class="java.lang.String">
         <property name="com.jaspersoft.studio.field.name" value="productName"/>
         <property name="com.jaspersoft.studio.field.label" value="productName"/>
         <property name="com.jaspersoft.studio.field.tree.path" value="customer"/>
@@ -116,7 +116,7 @@ WHERE
         <expression><![CDATA[$F{brand}]]></expression>
     </group>
     <group name="productName">
-        <expression><![CDATA[$F{productName}]]></expression>
+        <expression><![CDATA[$F{product_name}]]></expression>
     </group>
     <group name="quantity">
         <expression><![CDATA[$F{quantity}]]></expression>
@@ -192,7 +192,7 @@ WHERE
                 <property name="com.jaspersoft.studio.spreadsheet.connectionID" value="431be445-27b4-460d-8794-dc193f5be8a0"/>
             </element>
             <element kind="textField" uuid="6a09bc2e-98c6-4b1d-8253-8ab8134dc22f" x="43" y="-16" width="46" height="20" fontSize="6.0" hTextAlign="Center" vTextAlign="Middle">
-                <expression><![CDATA[$F{productName}]]></expression>
+                <expression><![CDATA[$F{product_name}]]></expression>
                 <property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fd3f561a-d560-4f98-a499-3b0ce2563b24"/>
             </element>
             <element kind="textField" uuid="52a940d2-8320-4f7d-940f-01d77c47b78d" x="89" y="-16" width="47" height="20" fontSize="6.0" hTextAlign="Center" vTextAlign="Middle">

@@ -27,7 +27,6 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
 
-import javax.xml.transform.Result;
 import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
@@ -48,22 +47,22 @@ public class DashboardController implements Initializable {
     private Button addProducts_btn;
 
     @FXML
-    private TableColumn<productData, String> addProducts_col_brand;
+    private TableColumn<ProductData, String> addProducts_col_brand;
 
     @FXML
-    private TableColumn<productData, String> addProducts_col_price;
+    private TableColumn<ProductData, String> addProducts_col_price;
 
     @FXML
-    private TableColumn<productData, String> addProducts_col_productId;
+    private TableColumn<ProductData, String> addProducts_col_productId;
 
     @FXML
-    private TableColumn<productData, String> addProducts_col_productName;
+    private TableColumn<ProductData, String> addProducts_col_productName;
 
     @FXML
-    private TableColumn<productData, String> addProducts_col_status;
+    private TableColumn<ProductData, String> addProducts_col_status;
 
     @FXML
-    private TableColumn<productData, String> addProducts_col_type;
+    private TableColumn<ProductData, String> addProducts_col_type;
 
     @FXML
     private Button addProducts_deleteBtn;
@@ -99,7 +98,7 @@ public class DashboardController implements Initializable {
     private ComboBox<String> addProducts_status;
 
     @FXML
-    private TableView<productData> addProducts_tableView;
+    private TableView<ProductData> addProducts_tableView;
 
     @FXML
     private Button addProducts_updateBtn;
@@ -150,19 +149,19 @@ public class DashboardController implements Initializable {
     private Button orders_btn;
 
     @FXML
-    private TableColumn<customerData, String> orders_col_brand;
+    private TableColumn<CustomerData, String> orders_col_brand;
 
     @FXML
-    private TableColumn<customerData, String> orders_col_price;
+    private TableColumn<CustomerData, String> orders_col_price;
 
     @FXML
-    private TableColumn<customerData, String> orders_col_productName;
+    private TableColumn<CustomerData, String> orders_col_productName;
 
     @FXML
-    private TableColumn<customerData, String> orders_col_quantity;
+    private TableColumn<CustomerData, String> orders_col_quantity;
 
     @FXML
-    private TableColumn<customerData, String> orders_col_type;
+    private TableColumn<CustomerData, String> orders_col_type;
 
     @FXML
     private AnchorPane orders_form;
@@ -186,7 +185,7 @@ public class DashboardController implements Initializable {
     private Button orders_resetBtn;
 
     @FXML
-    private TableView<customerData> orders_tableView;
+    private TableView<CustomerData> orders_tableView;
 
     @FXML
     private Label orders_total;
@@ -205,6 +204,7 @@ public class DashboardController implements Initializable {
 
     private Image image;
 
+    // Нүүр хэсэгт нийт захиалгын тоог харуулах функц
     public void homeDisplayTotalOrders() {
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
@@ -228,6 +228,7 @@ public class DashboardController implements Initializable {
         }
     }
 
+    // Нүүр хэсэгт нийт орлогын мэдээллийг харуулах функц
     public void homeTotalIncome() {
         String sql = "SELECT SUM(total) FROM customer_receipt";
         connect = Database.connectDB();
@@ -314,7 +315,7 @@ public class DashboardController implements Initializable {
 
     // Database-д бараа нэмэх функц
     public void addProductsAdd() {
-        String sql = "INSERT INTO product (product_id, type, brand, productName, price, status, image, date) "
+        String sql = "INSERT INTO product (product_id, type, brand, product_name, price, status, image, date) "
                 + "VALUES(?,?,?,?,?,?,?,?)";
         connect = Database.connectDB();
 
@@ -387,7 +388,7 @@ public class DashboardController implements Initializable {
         String sql = "UPDATE product SET " +
                 "type = '" + addProducts_productType.getSelectionModel().getSelectedItem()
                 + "', brand = '" + addProducts_brand.getText()
-                + "', productName = '" + addProducts_productName.getText()
+                + "', product_name = '" + addProducts_productName.getText()
                 + "', price = '" + addProducts_price.getText()
                 + "', status = '" + addProducts_status.getSelectionModel().getSelectedItem()
                 + "', image = '" + uri + "', date = '" + sqlDate + "' WHERE product_id = '"
@@ -523,7 +524,7 @@ public class DashboardController implements Initializable {
     }
 
     public void addProductsSearch() {
-        FilteredList<productData> filter = new FilteredList<>(addProductsList, e -> true);
+        FilteredList<ProductData> filter = new FilteredList<>(addProductsList, e -> true);
 
         addProducts_search.textProperty().addListener((Observable, oldValue, newValue) -> {
             filter.setPredicate(predicateProductData -> {
@@ -547,15 +548,15 @@ public class DashboardController implements Initializable {
             });
         });
 
-        SortedList<productData> sortList = new SortedList<>(filter);
+        SortedList<ProductData> sortList = new SortedList<>(filter);
 
         sortList.comparatorProperty().bind(addProducts_tableView.comparatorProperty());
         addProducts_tableView.setItems(sortList);
     }
 
     // Бараа хүснэгтээс мэдээллүүдийг авч харгалзах загвар өгөгдөлд олгох
-    public ObservableList<productData> addProductsListData() {
-        ObservableList<productData> productList = FXCollections.observableArrayList();
+    public ObservableList<ProductData> addProductsListData() {
+        ObservableList<ProductData> productList = FXCollections.observableArrayList();
 
         String sql = "SELECT * FROM product";
         connect = Database.connectDB();
@@ -565,13 +566,13 @@ public class DashboardController implements Initializable {
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
-            productData prodD;
+            ProductData prodD;
 
             while (result.next()) {
-                prodD = new productData(result.getInt("product_id"),
+                prodD = new ProductData(result.getInt("product_id"),
                         result.getString("type"),
                         result.getString("brand"),
-                        result.getString("productName"),
+                        result.getString("product_name"),
                         result.getDouble("price"),
                         result.getString("status"),
                         result.getString("image"),
@@ -585,7 +586,7 @@ public class DashboardController implements Initializable {
         return productList;
     }
 
-    private ObservableList<productData> addProductsList;
+    private ObservableList<ProductData> addProductsList;
 
     // Барааны мэдээллээр хүснэгтийн багануудыг дүүргэх
     public void addProductsShowListData() {
@@ -603,7 +604,7 @@ public class DashboardController implements Initializable {
 
     // Хүснэгтэн дэх барааны мэдээлэл дээр дарахад дэлгэрэнгүйг харуулах функц
     public void addProductsSelect() {
-        productData prodD = addProducts_tableView.getSelectionModel().getSelectedItem();
+        ProductData prodD = addProducts_tableView.getSelectionModel().getSelectedItem();
         int num = addProducts_tableView.getSelectionModel().getSelectedIndex();
 
         if ((num - 1) < -1) return;
@@ -625,7 +626,7 @@ public class DashboardController implements Initializable {
 
         customerId();
 
-        String sql = "INSERT INTO customer (customer_id, type, brand, productName, quantity, price, date)"
+        String sql = "INSERT INTO customer (customer_id, type, brand, product_name, quantity, price, date)"
                 + "VALUES(?,?,?,?,?,?,?)";
 
         connect = Database.connectDB();
@@ -633,7 +634,7 @@ public class DashboardController implements Initializable {
 
         try {
 
-            String checkData = "SELECT * FROM product WHERE productName = '"
+            String checkData = "SELECT * FROM product WHERE product_name = '"
                     + orders_productName.getSelectionModel().getSelectedItem() + "'";
 
             double priceData = 0;
@@ -745,7 +746,7 @@ public class DashboardController implements Initializable {
         hash.put("inventoryP", ListData.customerId);
         try {
 
-            JasperDesign jDesign = JRXmlLoader.load("C:\\Users\\Dell\\Documents\\24-25 FALL\\Software Development\\Lab\\InventoryManagementSystem\\src\\main\\java\\com\\example\\inventorymanagementsystem\\report.jrxml");
+            JasperDesign jDesign = JRXmlLoader.load("C:\\Users\\Dell\\Documents\\24-25 FALL\\Software Development\\Lab\\InventoryManagementSystem\\src\\main\\java\\com\\example\\inventorymanagementsystem\\Report.jrxml");
             JasperReport jReport = JasperCompileManager.compileReport(jDesign);
             JasperPrint jPrint = JasperFillManager.fillReport(jReport, hash, connect);
 
@@ -900,7 +901,7 @@ public class DashboardController implements Initializable {
 
     public void ordersListProductName() {
 
-        String sql = "SELECT productName FROM product WHERE brand = '"
+        String sql = "SELECT product_name FROM product WHERE brand = '"
                 + orders_brand.getSelectionModel().getSelectedItem() + "'";
 
         connect = Database.connectDB();
@@ -912,7 +913,7 @@ public class DashboardController implements Initializable {
             ObservableList listData = FXCollections.observableArrayList();
 
             while (result.next()) {
-                listData.add(result.getString("productName"));
+                listData.add(result.getString("product_name"));
             }
 
             orders_productName.setItems(listData);
@@ -938,25 +939,25 @@ public class DashboardController implements Initializable {
     }
 
 
-    public ObservableList<customerData> ordersListData() {
+    public ObservableList<CustomerData> ordersListData() {
 
         customerId();
-        ObservableList<customerData> listData = FXCollections.observableArrayList();
+        ObservableList<CustomerData> listData = FXCollections.observableArrayList();
         String sql = "SELECT * FROM customer WHERE customer_id = '" + ListData.customerId + "'";
 
         connect = Database.connectDB();
 
         try {
-            customerData customerD;
+            CustomerData customerD;
             assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
             while (result.next()) {
-                customerD = new customerData(result.getInt("customer_id"),
+                customerD = new CustomerData(result.getInt("customer_id"),
                         result.getString("type"),
                         result.getString("brand"),
-                        result.getString("productName"),
+                        result.getString("product_name"),
                         result.getInt("quantity"),
                         result.getDouble("price"),
                         result.getDate("date"));
@@ -970,7 +971,7 @@ public class DashboardController implements Initializable {
         return listData;
     }
 
-    private ObservableList<customerData> ordersList;
+    private ObservableList<CustomerData> ordersList;
 
     public void ordersShowListData() {
         ordersList = ordersListData();
@@ -1037,7 +1038,7 @@ public class DashboardController implements Initializable {
             addProducts_form.setVisible(false);
             orders_form.setVisible(false);
 
-            home_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
+            home_btn.setStyle("-fx-background-color: #fff;");
             addProducts_btn.setStyle("-fx-background-color: transparent");
             orders_btn.setStyle("-fx-background-color: transparent");
 
@@ -1053,7 +1054,7 @@ public class DashboardController implements Initializable {
             addProducts_form.setVisible(true);
             orders_form.setVisible(false);
 
-            addProducts_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
+            addProducts_btn.setStyle("-fx-background-color: #fff;");
             home_btn.setStyle("-fx-background-color: transparent");
             orders_btn.setStyle("-fx-background-color: transparent");
 
@@ -1067,7 +1068,7 @@ public class DashboardController implements Initializable {
             addProducts_form.setVisible(false);
             orders_form.setVisible(true);
 
-            orders_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
+            orders_btn.setStyle("-fx-background-color: #fff;");
             addProducts_btn.setStyle("-fx-background-color: transparent");
             home_btn.setStyle("-fx-background-color: transparent");
 
@@ -1080,7 +1081,7 @@ public class DashboardController implements Initializable {
     }
 
     public void defaultNav() {
-        home_btn.setStyle("-fx-background-color: linear-gradient(to bottom right, #d97f30, #6d6e30);");
+        home_btn.setStyle("-fx-background-color: #fff;");
     }
 
     private double x = 0;

@@ -2,7 +2,7 @@ package com.example.inventorymanagementsystem;
 
 import java.sql.Date;
 
-public class productData {
+public class ProductData {
     private Integer productId;
     private String type;
     private String brand;
@@ -12,7 +12,7 @@ public class productData {
     private String image;
     private Date date;
 
-    public productData(Integer productId, String type, String brand, String productName, Double price, String status, String image, Date date) {
+    public ProductData(Integer productId, String type, String brand, String productName, Double price, String status, String image, Date date) {
         this.productId = productId;
         this.type = type;
         this.brand = brand;
