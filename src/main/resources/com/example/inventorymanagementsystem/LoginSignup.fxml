@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="439.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.inventorymanagementsystem.MainController">
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <AnchorPane prefHeight="439.0" prefWidth="347.0" styleClass="left-form" stylesheets="@../../../design/LoginSignupDesign.css">
+               <children>
+                  <FontAwesomeIconView fill="WHITE" glyphName="TRUCK" layoutX="114.0" layoutY="201.0" size="10em" />
+                  <Label layoutX="73.0" layoutY="218.0" text="Бараа агуулахын систем" textFill="WHITE">
+                     <font>
+                        <Font name="Tahoma" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="signup_form" layoutX="352.8" prefHeight="439.0" prefWidth="347.0" styleClass="right-form" stylesheets="@../../../design/LoginSignupDesign.css" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="353.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Label layoutX="89.0" layoutY="130.0" text="Бүртгүүлэх">
+                     <font>
+                        <Font name="Tahoma Bold" size="28.0" />
+                     </font>
+                  </Label>
+                  <FontAwesomeIconView fill="#fd7134" glyphName="USER_PLUS" layoutX="140.0" layoutY="113.0" size="5em" text="" wrappingWidth="74.51424312591553" />
+                  <TextField fx:id="signup_username" layoutX="66.0" layoutY="184.0" onAction="#signupUser" prefHeight="30.0" prefWidth="220.0" promptText="Хэрэглэгчийн нэр" styleClass="textfield" stylesheets="@../../../design/LoginSignupDesign.css" />
+                  <PasswordField fx:id="signup_password" layoutX="66.0" layoutY="231.0" onAction="#signupUser" prefHeight="30.0" prefWidth="220.0" promptText="Нууц үг" styleClass="textfield" stylesheets="@../../../design/LoginSignupDesign.css" />
+                  <PasswordField fx:id="signup_repassword" layoutX="67.0" layoutY="278.0" onAction="#signupUser" prefHeight="30.0" prefWidth="220.0" promptText="Нууц үг давтах" styleClass="textfield" stylesheets="@../../../design/LoginSignupDesign.css" />
+                  <Button layoutX="78.0" layoutY="321.0" mnemonicParsing="false" onAction="#signupUser" prefHeight="35.0" prefWidth="200.0" styleClass="login-signup-btn" stylesheets="@../../../design/LoginSignupDesign.css" text="Бүртгүүлэх" />
+                  <Button layoutX="315.0" layoutY="4.0" mnemonicParsing="false" onAction="#close" styleClass="close" stylesheets="@../../../design/LoginSignupDesign.css">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="CLOSE" size="1.2em" />
+                     </graphic>
+                  </Button>
+                  <Label layoutX="101.0" layoutY="377.0" text="Бүртгэлтэй юу?" />
+                  <Hyperlink layoutX="187.0" layoutY="374.0" onAction="#loginForm" prefHeight="23.0" prefWidth="52.0" text="Нэвтрэх" textFill="#fd7134" />
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="login_form" layoutX="350.0" prefHeight="439.0" prefWidth="347.0" styleClass="right-form" stylesheets="@../../../design/LoginSignupDesign.css" AnchorPane.rightAnchor="0.0">
+               <children>
+                  <FontAwesomeIconView fill="#fd7134" glyphName="USER" layoutX="152.0" layoutY="109.0" size="5em" />
+                  <Label layoutX="114.0" layoutY="131.0" text="Нэвтрэх">
+                     <font>
+                        <Font name="Tahoma Bold" size="28.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="login_username" layoutX="75.0" layoutY="204.0" onAction="#loginUser" prefHeight="30.0" prefWidth="220.0" promptText="Хэрэглэгчийн нэр" styleClass="textfield" stylesheets="@../../../design/LoginSignupDesign.css" />
+                  <PasswordField fx:id="login_password" layoutX="75.0" layoutY="252.0" onAction="#loginUser" prefHeight="30.0" prefWidth="220.0" promptText="Нууц үг" styleClass="textfield" stylesheets="@../../../design/LoginSignupDesign.css" />
+                  <Button fx:id="loginBtn" layoutX="85.0" layoutY="299.0" mnemonicParsing="false" onAction="#loginUser" prefHeight="35.0" prefWidth="200.0" styleClass="login-signup-btn" stylesheets="@../../../design/LoginSignupDesign.css" text="Нэвтрэх" textAlignment="CENTER" />
+                  <Button layoutX="307.0" layoutY="14.0" mnemonicParsing="false" onAction="#close" styleClass="close" stylesheets="@../../../design/LoginSignupDesign.css" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="CLOSE" size="1.2em" />
+                     </graphic>
+                  </Button>
+                  <Hyperlink layoutX="195.0" layoutY="353.0" onAction="#signupForm" text="Бүртгүүлэх" textFill="#fd7134" />
+                  <Label layoutX="108.0" layoutY="357.0" text="Бүртгэлгүй юу?" />
+               </children>
+            </AnchorPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>

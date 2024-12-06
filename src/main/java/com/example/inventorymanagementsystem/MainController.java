@@ -13,69 +13,71 @@ import javafx.stage.StageStyle;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Objects;
 
 public class MainController {
     @FXML
-    private Button close;
-
-    @FXML
     private Button loginBtn;
 
     @FXML
-    private AnchorPane main_form;
+    private AnchorPane login_form;
 
     @FXML
-    private PasswordField password;
+    private AnchorPane signup_form;
 
     @FXML
-    private TextField username;
+    private PasswordField login_password;
+
+    @FXML
+    private TextField login_username;
+
+    @FXML
+    private PasswordField signup_password;
+
+    @FXML
+    private PasswordField signup_repassword;
+
+    @FXML
+    private TextField signup_username;
 
     //Database тохиргоо
     private Connection connect;
     private PreparedStatement prepare;
     private ResultSet result;
-
+    private Statement statement;
 
     private double x = 0;
     private double y = 0;
 
-    public void loginAdmin() {
-        String sql = "SELECT * FROM admin WHERE username = ? and password = ?";
+    AlertMessage alert = new AlertMessage();
 
+    private static final String DB_TABLE_USER = "user";
+
+    // хэрэглэгч нэвтрэх функц
+    public void loginUser() {
+        String selectData = "SELECT * FROM " + DB_TABLE_USER + " WHERE username = ? and password = ?";
         connect = Database.connectDB();
 
         try {
             assert connect != null; // (DB холболт шалгана)
-            prepare = connect.prepareStatement(sql);
-            prepare.setString(1, username.getText());
-            prepare.setString(2, password.getText());
-
+            prepare = connect.prepareStatement(selectData);
+            prepare.setString(1, login_username.getText());
+            prepare.setString(2, login_password.getText());
             result = prepare.executeQuery();
-            Alert alert;
 
             // аль нэг талбар хоосон бол
-            if (username.getText().isEmpty() || password.getText().isEmpty()) {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Алдаа гарлаа");
-                alert.setHeaderText(null);
-                alert.setContentText("Хоосон талбаруудыг бөглөнө үү!");
-                alert.showAndWait();
+            if (login_username.getText().isEmpty() || login_password.getText().isEmpty()) {
+                alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
             }
 
             // амжилттай нэвтэрвэл
             if (result.next()) {
-                ListData.username = username.getText();
-                // username, password correct bol dashboard form ruu shiljih
-                alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Мэдэгдэл");
-                alert.setHeaderText(null);
-                alert.setContentText("Амжилттай нэвтэрлээ!");
-                alert.showAndWait();
-
+                ListData.username = login_username.getText();
+                // login_username, login_password зөв бол dashboard form руу шилжинэ
+                alert.successMessage("Амжилттай нэвтэрлээ!");
                 // Логин цонхыг нуух
                 loginBtn.getScene().getWindow().hide();
-
 
                 // Dashboard хуудас нээх
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Dashboard.fxml")));
@@ -98,19 +100,58 @@ public class MainController {
                 stage.setScene(scene);
                 stage.show();
             } else { // Амжилтгүй болвол
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Алдаа гарлаа");
-                alert.setHeaderText(null);
-                alert.setContentText("Нэвтрэх нэр эсвэл нууц үг буруу байна!");
-                alert.showAndWait();
+                alert.errorMessage("Нэвтрэх нэр эсвэл нууц үг буруу байна!");
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
-    // хаах улаан товч
-    public void close() {
-        System.exit(0);
+    //хэрэглэгч шинээр бүртгүүлэх функц
+    public void signupUser() {
+        String selectData = "SELECT * FROM " + DB_TABLE_USER + " WHERE username = '" + signup_username.getText() + "'";
+        connect = Database.connectDB();
+
+        try {
+            assert connect != null;
+            statement = connect.createStatement();
+            result = statement.executeQuery(selectData);
+
+            if (result.next()) {
+                alert.errorMessage(signup_username.getText() + " нэртэй хэрэглэгч аль хэдийн бүртгэгдсэн байна.");
+            }
+
+            if (!signup_password.getText().equals(signup_repassword.getText())) {
+                alert.errorMessage("Нууц үг таарахгүй байна.");
+            }
+
+            if (signup_password.getText().length() < 8) {
+                alert.errorMessage("Нууц үг дор хаяж 8 тэмдэгтээс бүрдсэн байх ёстой.");
+            }
+
+            String insertData = "INSERT INTO " + DB_TABLE_USER + " (username, password) VALUES(?, ?)";
+            prepare = connect.prepareStatement(insertData);
+            prepare.setString(1, signup_username.getText());
+            prepare.setString(2, signup_password.getText());
+            prepare.executeUpdate();
+
+            alert.successMessage("Амжилттай бүртгэгдлээ. Нэвтэрч орно уу.");
+            loginForm();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
     }
+
+    public void loginForm() {
+        login_form.setVisible(true);
+        signup_form.setVisible(false);
+    }
+
+    public void signupForm() {
+        login_form.setVisible(false);
+        signup_form.setVisible(true);
+    }
+
+    // хаах улаан товч
+    public void close() { System.exit(0); }
 }

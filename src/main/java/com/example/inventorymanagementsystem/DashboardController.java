@@ -1011,6 +1011,7 @@ public class DashboardController implements Initializable {
             }
 
             String checkData = "SELECT * FROM customer_receipt";
+            statement = connect.createStatement();
             result = statement.executeQuery(checkData);
 
             while (result.next()) {
@@ -1100,7 +1101,7 @@ public class DashboardController implements Initializable {
                 logout.getScene().getWindow().hide();
 
                 // login form oo holboh
-                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Login.fxml")));
+                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("LoginSignup.fxml")));
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
 
