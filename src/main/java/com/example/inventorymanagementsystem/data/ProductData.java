@@ -1,4 +1,4 @@
-package com.example.inventorymanagementsystem;
+package com.example.inventorymanagementsystem.data;
 
 import java.sql.Date;
 

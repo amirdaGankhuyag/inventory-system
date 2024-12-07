@@ -1,5 +1,8 @@
-package com.example.inventorymanagementsystem;
+package com.example.inventorymanagementsystem.controller;
 
+import com.example.inventorymanagementsystem.AlertMessage;
+import com.example.inventorymanagementsystem.Database;
+import com.example.inventorymanagementsystem.data.ListData;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

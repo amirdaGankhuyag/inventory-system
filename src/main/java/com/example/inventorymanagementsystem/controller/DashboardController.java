@@ -1,5 +1,10 @@
-package com.example.inventorymanagementsystem;
+package com.example.inventorymanagementsystem.controller;
 
+import com.example.inventorymanagementsystem.AlertMessage;
+import com.example.inventorymanagementsystem.data.CustomerData;
+import com.example.inventorymanagementsystem.Database;
+import com.example.inventorymanagementsystem.data.ListData;
+import com.example.inventorymanagementsystem.data.ProductData;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -204,6 +209,8 @@ public class DashboardController implements Initializable {
 
     private Image image;
 
+    AlertMessage alert = new AlertMessage();
+
     // Нүүр хэсэгт нийт захиалгын тоог харуулах функц
     public void homeDisplayTotalOrders() {
         Date date = new Date();
@@ -215,6 +222,7 @@ public class DashboardController implements Initializable {
         int countOrders = 0;
 
         try {
+            assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
@@ -224,7 +232,7 @@ public class DashboardController implements Initializable {
 
             home_numberOrder.setText(String.valueOf(countOrders));
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
     }
 
@@ -236,6 +244,7 @@ public class DashboardController implements Initializable {
         double totalIncome = 0;
 
         try {
+            assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
@@ -245,7 +254,7 @@ public class DashboardController implements Initializable {
 
             home_totalIncome.setText(String.valueOf(totalIncome) + "₮");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
     }
 
@@ -321,7 +330,6 @@ public class DashboardController implements Initializable {
 
         try {
             // Аль нэг талбар нь хоосон бол алдаа өгнө
-            Alert alert;
             if (addProducts_productId.getText().isEmpty() ||
                     addProducts_productType.getSelectionModel().getSelectedItem() == null ||
                     addProducts_brand.getText().isEmpty() ||
@@ -329,11 +337,7 @@ public class DashboardController implements Initializable {
                     addProducts_price.getText().isEmpty() ||
                     addProducts_status.getSelectionModel().getSelectedItem() == null ||
                     ListData.path == "") {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Алдааны мэдэгдэл");
-                alert.setHeaderText(null);
-                alert.setContentText("Хоосон талбаруудыг бөглөнө үү!");
-                alert.showAndWait();
+                alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
             } else {
                 // Алдаагүй үед
 
@@ -344,11 +348,7 @@ public class DashboardController implements Initializable {
 
                 // Хэрэв байвал
                 if (result.next()) {
-                    alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Алдааны мэдэгдэл");
-                    alert.setHeaderText(null);
-                    alert.setContentText(addProducts_productId.getText() + " дугаартай бараа аль хэдийн нэмэгдсэн байна!");
-                    alert.showAndWait();
+                    alert.errorMessage(addProducts_productId.getText() + " дугаартай бараа аль хэдийн нэмэгдсэн байна!");
                 } else {
                     // Байхгүй бол
                     assert connect != null;
@@ -397,7 +397,6 @@ public class DashboardController implements Initializable {
         connect = Database.connectDB();
 
         try {
-            Alert alert;
             if (addProducts_productId.getText().isEmpty() ||
                     addProducts_productType.getSelectionModel().getSelectedItem() == null ||
                     addProducts_brand.getText().isEmpty() ||
@@ -405,26 +404,14 @@ public class DashboardController implements Initializable {
                     addProducts_price.getText().isEmpty() ||
                     addProducts_status.getSelectionModel().getSelectedItem() == null ||
                     ListData.path == "") {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Алдааны мэдэгдэл");
-                alert.setHeaderText(null);
-                alert.setContentText("Хоосон талбаруудыг бөглөнө үү!");
-                alert.showAndWait();
+                alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
             } else {
-                alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Баталгаажуулалт");
-                alert.setHeaderText(null);
-                alert.setContentText("Та " + addProducts_productId.getText() + " дугаартай барааг шинэчлэхдээ итгэлтэй байна уу?");
-                Optional<ButtonType> option = alert.showAndWait();
-                if (option.get().equals(ButtonType.OK)) {
+
+                if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг шинэчлэхдээ итгэлтэй байна уу?")) {
                     statement = connect.createStatement();
                     statement.executeUpdate(sql);
 
-                    alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Мэдэгдэл");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Амжилттай шинэчлэгдлээ.");
-                    alert.showAndWait();
+                    alert.successMessage("Амжилттай шинэчлэгдлээ.");
 
                     addProductsShowListData();
                     addProductsReset();
@@ -440,7 +427,6 @@ public class DashboardController implements Initializable {
 
         connect = Database.connectDB();
         try {
-            Alert alert;
             if (addProducts_productId.getText().isEmpty() ||
                     addProducts_productType.getSelectionModel().getSelectedItem() == null ||
                     addProducts_brand.getText().isEmpty() ||
@@ -448,26 +434,13 @@ public class DashboardController implements Initializable {
                     addProducts_price.getText().isEmpty() ||
                     addProducts_status.getSelectionModel().getSelectedItem() == null ||
                     ListData.path == "") {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Алдааны мэдэгдэл");
-                alert.setHeaderText(null);
-                alert.setContentText("Хоосон талбаруудыг бөглөнө үү!");
-                alert.showAndWait();
+                alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
             } else {
-                alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Баталгаажуулалт");
-                alert.setHeaderText(null);
-                alert.setContentText("Та " + addProducts_productId.getText() + " дугаартай барааг устгахдаа итгэлтэй байна уу?");
-                Optional<ButtonType> option = alert.showAndWait();
-                if (option.get().equals(ButtonType.OK)) {
+                if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг устгахдаа итгэлтэй байна уу?")) {
                     statement = connect.createStatement();
                     statement.executeUpdate(sql);
 
-                    alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Мэдэгдэл");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Амжилттай устгалаа.");
-                    alert.showAndWait();
+                    alert.successMessage("Амжилттай устгалаа.");
 
                     addProductsShowListData();
                     addProductsReset();
@@ -649,17 +622,11 @@ public class DashboardController implements Initializable {
 
             double totalPData = (priceData * qty);
 
-            Alert alert;
-
             if (orders_productType.getSelectionModel().getSelectedItem() == null
                     || orders_brand.getSelectionModel().getSelectedItem() == null
                     || orders_productName.getSelectionModel().getSelectedItem() == null
                     || totalPData == 0) {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Алдааны мэдэгдэл");
-                alert.setHeaderText(null);
-                alert.setContentText("Та эхлээд бараагаа сонгоно уу.");
-                alert.showAndWait();
+                alert.errorMessage("Та эхлээд бараагаа сонгоно уу.");
             } else {
                 prepare = connect.prepareStatement(sql);
                 prepare.setString(1, String.valueOf(ListData.customerId));
@@ -695,16 +662,9 @@ public class DashboardController implements Initializable {
         connect = Database.connectDB();
 
         try {
-            Alert alert;
 
             if (totalP > 0 || orders_amount.getText().isEmpty() || amountP == 0) {
-                alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Баталгаажуулах мэдэгдэл");
-                alert.setHeaderText(null);
-                alert.setContentText("Та итгэлтэй байна уу?");
-                Optional<ButtonType> option = alert.showAndWait();
-
-                if (option.get().equals(ButtonType.OK)) {
+                if (alert.confirmMessage("Та итгэлтэй байна уу?")) {
                     prepare = connect.prepareStatement(sql);
                     prepare.setString(1, String.valueOf(ListData.customerId));
                     prepare.setString(2, String.valueOf(totalP));
@@ -717,11 +677,7 @@ public class DashboardController implements Initializable {
 
                     prepare.executeUpdate();
 
-                    alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Мэдэгдэл");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Амжилттай.");
-                    alert.showAndWait();
+                    alert.successMessage("Амжилттай.");
 
                     totalP = 0;
                     balanceP = 0;
@@ -730,11 +686,7 @@ public class DashboardController implements Initializable {
                     orders_balance.setText("0.0₮");
                 } else return;
             } else {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Алдааны мэдэгдэл");
-                alert.setHeaderText(null);
-                alert.setContentText("Invalid :>");
-                alert.showAndWait();
+                alert.errorMessage("Invalid :>");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -764,13 +716,7 @@ public class DashboardController implements Initializable {
         connect = Database.connectDB();
         try {
             if (!orders_tableView.getItems().isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Баталгаажуулах мэдэгдэл");
-                alert.setHeaderText(null);
-                alert.setContentText("Та дахин тохируулахдаа итгэлтэй байна уу?");
-                Optional<ButtonType> option = alert.showAndWait();
-
-                if (option.get().equals(ButtonType.OK)) {
+                if (alert.confirmMessage("Та дахин тохируулахдаа итгэлтэй байна уу?")) {
                     statement = connect.createStatement();
                     statement.executeUpdate(sql);
 
@@ -793,8 +739,6 @@ public class DashboardController implements Initializable {
     private double balanceP;
 
     public void ordersAmount() {
-        Alert alert;
-
         amountP = Double.parseDouble(orders_amount.getText());
 
         if (!orders_amount.getText().isEmpty()) {
@@ -806,24 +750,15 @@ public class DashboardController implements Initializable {
                     orders_balance.setText(String.valueOf(balanceP) + "₮");
 
                 } else {
-                    alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setHeaderText(null);
-                    alert.setContentText("Invalid :3");
-                    alert.showAndWait();
+                    alert.errorMessage("Invalid :3");
 
                     orders_amount.setText("");
                 }
             } else {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setHeaderText(null);
-                alert.setContentText("Invalid :>");
-                alert.showAndWait();
+                alert.errorMessage("Invalid :>");
             }
         } else {
-            alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText(null);
-            alert.setContentText("Invalid :>");
-            alert.showAndWait();
+            alert.errorMessage("Invalid :>");
         }
     }
 
@@ -854,13 +789,10 @@ public class DashboardController implements Initializable {
 
     }
 
-
-    private String[] orderListType = {"Зууш", "Ундаа", "Десерт", "Хувийн бараа", "Бусад"};
-
     public void ordersListType() {
         List<String> listT = new ArrayList<>();
 
-        for (String data : orderListType) {
+        for (String data : ListData.listType) {
             listT.add(data);
         }
 
@@ -898,7 +830,7 @@ public class DashboardController implements Initializable {
         }
     }
 
-
+    // Сонгосон брэнд дээр үндэслэсэн бүтээгдэхүүний нэр цэсийг дүүргэх
     public void ordersListProductName() {
 
         String sql = "SELECT product_name FROM product WHERE brand = '"
@@ -926,6 +858,7 @@ public class DashboardController implements Initializable {
 
     private SpinnerValueFactory<Integer> spinner;
 
+    // Тоо хэмжээний spinner control
     public void ordersSpinner() {
         spinner = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0);
 
@@ -934,13 +867,14 @@ public class DashboardController implements Initializable {
 
     private int qty;
 
+    // Spinner control-оос утгыг авах
     public void ordersShowSpinnerValue() {
         qty = orders_quantity.getValue();
     }
 
 
+    // Одоо байгаа хэрэглэгчдийн бүх захиалгыг өгөгдлийн сангаас татах.
     public ObservableList<CustomerData> ordersListData() {
-
         customerId();
         ObservableList<CustomerData> listData = FXCollections.observableArrayList();
         String sql = "SELECT * FROM customer WHERE customer_id = '" + ListData.customerId + "'";
@@ -973,6 +907,7 @@ public class DashboardController implements Initializable {
 
     private ObservableList<CustomerData> ordersList;
 
+    // Захиалгын өгөгдлийг TableView харуулах
     public void ordersShowListData() {
         ordersList = ordersListData();
 
@@ -991,7 +926,7 @@ public class DashboardController implements Initializable {
         orders_tableView.setItems(ordersList);
     }
 
-
+    // Хэрэглэгчийн ID үүсгэх
     public void customerId() {
 
         String customId = "SELECT * FROM customer";
@@ -1032,7 +967,7 @@ public class DashboardController implements Initializable {
 
     }
 
-
+    // Home, products, order формуудын хооронд шилжинэ.
     public void switchForm(ActionEvent event) {
         if (event.getSource() == home_btn) {
             home_form.setVisible(true);
@@ -1088,15 +1023,10 @@ public class DashboardController implements Initializable {
     private double x = 0;
     private double y = 0;
 
+    // Хэрэглэгчийг системээс гаргана.
     public void logout() {
         try {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Баталгаажуулалт");
-            alert.setHeaderText(null);
-            alert.setContentText("Та гарахдаа итгэлтэй байна уу?");
-            Optional<ButtonType> option = alert.showAndWait();
-
-            if (option.get().equals(ButtonType.OK)) {
+            if (alert.confirmMessage("Та гарахдаа итгэлтэй байна уу?")) {
                 // gol formoo hide hiih
                 logout.getScene().getWindow().hide();
 
@@ -1144,6 +1074,7 @@ public class DashboardController implements Initializable {
         System.exit(0);
     }
 
+    // Эхлэх үед dashboard-ийн үндсэн төлөвийг тохируулна.
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         defaultNav();
@@ -1156,7 +1087,7 @@ public class DashboardController implements Initializable {
         homeIncomeChart();
         homeOrdersChart();
 
-        // TableView deer bga data g haruulah
+        // TableView дээр байгаа датаг харуулах
         addProductsShowListData();
         addProductsListStatus();
         addProductsListType();
