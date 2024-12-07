@@ -42,7 +42,7 @@ import java.util.*;
 
 /**
  * DashboardController нь dashboard UI болон backend хоорондын харилцан үйлчлэлийг удирдана.
-
+ * <p>
  * Энэ нь статистик мэдээллийг харуулах, бүтээгдэхүүнтэй харьцах, захиалгыг удирдах функцуудыг агуулдаг.
  **/
 
@@ -215,12 +215,19 @@ public class DashboardController implements Initializable {
 
     AlertMessage alert = new AlertMessage();
 
-    // Нүүр хэсэгт нийт захиалгын тоог харуулах функц
-    public void homeDisplayTotalOrders() {
+    /**
+     * SQL date авах функц.
+     */
+    public java.sql.Date getSqlDate() {
         Date date = new Date();
-        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        return new java.sql.Date(date.getTime());
+    }
 
-        String count = "SELECT COUNT(id) FROM " + DB_TABLE_CUSTOMER + " WHERE date = '" + sqlDate + "'";
+    /**
+     * Нүүр хэсэгт нийт захиалгын тоог харуулах функц.
+     */
+    public void homeDisplayTotalOrders() {
+        String count = "SELECT COUNT(id) FROM " + DB_TABLE_CUSTOMER + " WHERE date = '" + getSqlDate() + "'";
         connect = Database.connectDB();
 
         int countOrders = 0;
@@ -240,7 +247,9 @@ public class DashboardController implements Initializable {
         }
     }
 
-    // Нүүр хэсэгт нийт орлогын мэдээллийг харуулах функц
+    /**
+     * Нүүр хэсэгт нийт орлогын мэдээллийг харуулах функц
+     */
     public void homeTotalIncome() {
         String selectData = "SELECT SUM(total) FROM " + DB_TABLE_CUST_RECEIPT + " ";
         connect = Database.connectDB();
@@ -263,7 +272,7 @@ public class DashboardController implements Initializable {
     }
 
     /**
-    * Боломжтой бүтээгдэхүүний нийт тоог харуулна.
+     * Боломжтой бүтээгдэхүүний нийт тоог харуулна.
      **/
     public void homeAvailableProducts() {
         String sql = "SELECT COUNT(id) FROM " + DB_TABLE_PRODUCT + " WHERE status = 'Боломжтой'";
@@ -286,49 +295,61 @@ public class DashboardController implements Initializable {
         }
     }
 
-    // Өдөр тутмын орлогын trend-ийг график дээр харуулна.
+    /**
+     * Өдөр тутмын орлогын trend-ийг график дээр харуулна.
+     */
     public void homeIncomeChart() {
         home_incomeChart.getData().clear();
-
         String sql = "SELECT date, SUM(total) FROM " + DB_TABLE_CUST_RECEIPT + " GROUP BY TIMESTAMP(date) ASC LIMIT 6";
-        connect = Database.connectDB();
-        XYChart.Series chart = new XYChart.Series();
-
-        try {
-            prepare = connect.prepareStatement(sql);
-            result = prepare.executeQuery();
-
-            while (result.next()) {
-                chart.getData().add(new XYChart.Data(result.getString(1), result.getInt(2)));
-            }
-
-            home_incomeChart.getData().add(chart);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        home_incomeChart.getData().add(updateChart(sql));
     }
-    // Захиалгын trend-ийг огноогоор харуулна.
+
+    /**
+     * Захиалгын trend-ийг огноогоор харуулна.
+     */
     public void homeOrdersChart() {
         home_orderChart.getData().clear();
         String sql = "SELECT date, COUNT(id) FROM " + DB_TABLE_CUSTOMER + " GROUP BY date ORDER BY TIMESTAMP(date) ASC LIMIT 5";
+        home_orderChart.getData().add(updateChart(sql));
+    }
+
+    /**
+     * Графикийг SQL query дэх өгөгдлийг ашиглан шинэчлэнэ.
+     *
+     * @param query Өгөгдлийг авах SQL query.
+     */
+    public XYChart.Series updateChart(String query) {
         connect = Database.connectDB();
         XYChart.Series chart = new XYChart.Series();
-
         try {
-            prepare = connect.prepareStatement(sql);
+            prepare = connect.prepareStatement(query);
             result = prepare.executeQuery();
 
             while (result.next()) {
                 chart.getData().add(new XYChart.Data(result.getString(1), result.getInt(2)));
             }
-
-            home_orderChart.getData().add(chart);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return chart;
     }
 
-    // Database-д бараа нэмэх функц
+    /**
+     * Талбарууд нь хоосон эсэхийг шалгах функц.
+     */
+    private boolean isInputValidOnProduct() {
+        return addProducts_productId.getText().isEmpty() ||
+                addProducts_productType.getSelectionModel().getSelectedItem() == null ||
+                addProducts_brand.getText().isEmpty() ||
+                addProducts_productName.getText().isEmpty() ||
+                addProducts_price.getText().isEmpty() ||
+                addProducts_status.getSelectionModel().getSelectedItem() == null ||
+                ListData.path == null || ListData.path.isEmpty(); // ""
+    }
+
+    /**
+     * Database-д бараа нэмэх функц.
+     */
     public void addProductsAdd() {
         String sql = "INSERT INTO " + DB_TABLE_PRODUCT + " (product_id, type, brand, product_name, price, status, image, date) "
                 + "VALUES(?,?,?,?,?,?,?,?)";
@@ -336,60 +357,48 @@ public class DashboardController implements Initializable {
 
         try {
             // Аль нэг талбар нь хоосон бол алдаа өгнө
-            if (addProducts_productId.getText().isEmpty() ||
-                    addProducts_productType.getSelectionModel().getSelectedItem() == null ||
-                    addProducts_brand.getText().isEmpty() ||
-                    addProducts_productName.getText().isEmpty() ||
-                    addProducts_price.getText().isEmpty() ||
-                    addProducts_status.getSelectionModel().getSelectedItem() == null ||
-                    ListData.path == "") {
+            if (isInputValidOnProduct()) {
                 alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
+            }
+
+            // Алдаагүй үед тухайн ID-тай бараа аль хэдийн байгаа эсэхийг шалгана
+            String checkData = "SELECT product_id FROM " + DB_TABLE_PRODUCT + " WHERE product_id = '" + addProducts_productId.getText() + "'";
+            statement = connect.createStatement();
+            result = statement.executeQuery(checkData);
+
+            // Хэрэв байвал
+            if (result.next()) {
+                alert.errorMessage(addProducts_productId.getText() + " дугаартай бараа аль хэдийн нэмэгдсэн байна!");
             } else {
-                // Алдаагүй үед
+                // Байхгүй бол
+                assert connect != null;
+                prepare = connect.prepareStatement(sql);
+                prepare.setString(1, addProducts_productId.getText());
+                prepare.setString(2, addProducts_productType.getSelectionModel().getSelectedItem());
+                prepare.setString(3, addProducts_brand.getText());
+                prepare.setString(4, addProducts_productName.getText());
+                prepare.setString(5, addProducts_price.getText());
+                prepare.setString(6, addProducts_status.getSelectionModel().getSelectedItem());
 
-                // Тухайн ID-тай бараа аль хэдийн байгаа эсэхийг шалгана
-                String checkData = "SELECT product_id FROM " + DB_TABLE_PRODUCT + " WHERE product_id = '" + addProducts_productId.getText() + "'";
-                statement = connect.createStatement();
-                result = statement.executeQuery(checkData);
+                String uri = ListData.path;
+                uri = uri.replace("\\", "\\\\");
+                prepare.setString(7, uri);
 
-                // Хэрэв байвал
-                if (result.next()) {
-                    alert.errorMessage(addProducts_productId.getText() + " дугаартай бараа аль хэдийн нэмэгдсэн байна!");
-                } else {
-                    // Байхгүй бол
-                    assert connect != null;
-                    prepare = connect.prepareStatement(sql);
-                    prepare.setString(1, addProducts_productId.getText());
-                    prepare.setString(2, addProducts_productType.getSelectionModel().getSelectedItem());
-                    prepare.setString(3, addProducts_brand.getText());
-                    prepare.setString(4, addProducts_productName.getText());
-                    prepare.setString(5, addProducts_price.getText());
-                    prepare.setString(6, addProducts_status.getSelectionModel().getSelectedItem());
+                prepare.setString(8, String.valueOf(getSqlDate()));
 
-                    String uri = ListData.path;
-                    uri = uri.replace("\\", "\\\\");
-                    prepare.setString(7, uri);
-
-                    Date date = new Date();
-                    java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-                    prepare.setString(8, String.valueOf(sqlDate));
-
-                    prepare.executeUpdate(); // өөрчлөлтийг db-д оруулна
-                    addProductsShowListData(); // хүснэгтийг шинэчлэнэ
-                    addProductsReset(); // талбаруудыг цэвэрлэнэ
-                }
+                prepare.executeUpdate(); // өөрчлөлтийг db-д оруулна
+                addProductsShowListData(); // хүснэгтийг шинэчлэнэ
+                addProductsReset(); // талбаруудыг цэвэрлэнэ
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     //  Одоо байгаа бүтээгдэхүүнийг өөрчлөх
     public void addProductsUpdate() {
         String uri = ListData.path;
         uri = uri.replace("\\", "\\\\");
-
-        Date date = new Date();
-        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 
         String sql = "UPDATE " + DB_TABLE_PRODUCT + " SET " +
                 "type = '" + addProducts_productType.getSelectionModel().getSelectedItem()
@@ -397,67 +406,52 @@ public class DashboardController implements Initializable {
                 + "', product_name = '" + addProducts_productName.getText()
                 + "', price = '" + addProducts_price.getText()
                 + "', status = '" + addProducts_status.getSelectionModel().getSelectedItem()
-                + "', image = '" + uri + "', date = '" + sqlDate + "' WHERE product_id = '"
+                + "', image = '" + uri + "', date = '" + getSqlDate() + "' WHERE product_id = '"
                 + addProducts_productId.getText() + "'";
-
         connect = Database.connectDB();
 
         try {
-            if (addProducts_productId.getText().isEmpty() ||
-                    addProducts_productType.getSelectionModel().getSelectedItem() == null ||
-                    addProducts_brand.getText().isEmpty() ||
-                    addProducts_productName.getText().isEmpty() ||
-                    addProducts_price.getText().isEmpty() ||
-                    addProducts_status.getSelectionModel().getSelectedItem() == null ||
-                    ListData.path == "") {
+            if (isInputValidOnProduct()) {
                 alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
-            } else {
+            } else if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг шинэчлэхдээ итгэлтэй байна уу?")) {
+                statement = connect.createStatement();
+                statement.executeUpdate(sql);
 
-                if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг шинэчлэхдээ итгэлтэй байна уу?")) {
-                    statement = connect.createStatement();
-                    statement.executeUpdate(sql);
+                alert.successMessage("Амжилттай шинэчлэгдлээ.");
 
-                    alert.successMessage("Амжилттай шинэчлэгдлээ.");
-
-                    addProductsShowListData();
-                    addProductsReset();
-                }
+                addProductsShowListData();
+                addProductsReset();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     // Өгөгдлийн сангаас бүтээгдэхүүнийг устгах
     public void addProductsDelete() {
         String sql = "DELETE FROM " + DB_TABLE_PRODUCT + " WHERE product_id = '" + addProducts_productId.getText() + "'";
-
         connect = Database.connectDB();
+
         try {
-            if (addProducts_productId.getText().isEmpty() ||
-                    addProducts_productType.getSelectionModel().getSelectedItem() == null ||
-                    addProducts_brand.getText().isEmpty() ||
-                    addProducts_productName.getText().isEmpty() ||
-                    addProducts_price.getText().isEmpty() ||
-                    addProducts_status.getSelectionModel().getSelectedItem() == null ||
-                    ListData.path == "") {
+            if (isInputValidOnProduct()) {
                 alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
-            } else {
-                if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг устгахдаа итгэлтэй байна уу?")) {
-                    statement = connect.createStatement();
-                    statement.executeUpdate(sql);
+            } else if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг устгахдаа итгэлтэй байна уу?")) {
+                statement = connect.createStatement();
+                statement.executeUpdate(sql);
 
-                    alert.successMessage("Амжилттай устгалаа.");
+                alert.successMessage("Амжилттай устгалаа.");
 
-                    addProductsShowListData();
-                    addProductsReset();
-                }
+                addProductsShowListData();
+                addProductsReset();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // Формыг цэвэрлэх функц
+    /**
+     * Формыг цэвэрлэх функц.
+     */
     public void addProductsReset() {
         addProducts_productId.setText("");
         addProducts_productType.getSelectionModel().clearSelection();
@@ -470,11 +464,13 @@ public class DashboardController implements Initializable {
         addProducts_imageView.setImage(null);
     }
 
-    // Зураг оруулж ирэх функц
+    /**
+     * Зураг оруулж ирэх функц.
+     */
     public void addProductsImportImage() {
         FileChooser open = new FileChooser();
         open.setTitle("Барааны зураг сонгох");
-        open.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image File", "*jpg", "*png"));
+        open.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image File", "*jpg", "*png", "*jpeg"));
 
         File file = open.showOpenDialog(main_form.getScene().getWindow());
 
@@ -487,20 +483,23 @@ public class DashboardController implements Initializable {
     }
 
     public void addProductsListType() {
-        List<String> listT = new ArrayList<>();
-
-        for (String data : ListData.listType) listT.add(data);
-        ObservableList listData = FXCollections.observableArrayList(listT);
-        addProducts_productType.setItems(listData);
+        addProducts_productType.setItems(addDataToList(ListData.listType));
     }
 
     public void addProductsListStatus() {
-        List<String> listS = new ArrayList<>();
-
-        for (String data : ListData.listStatus) listS.add(data);
-        ObservableList listData = FXCollections.observableArrayList(listS);
-        addProducts_status.setItems(listData);
+        addProducts_status.setItems(addDataToList(ListData.listStatus));
     }
+
+    /**
+     * ComboBox-д нэмэх өгөгдлийг бэлтгэх функц.
+     *
+     * @param listItems нэмэх өгөгдлүүд
+     */
+    public ObservableList addDataToList(String[] listItems){
+        List<String> list = new ArrayList<>(Arrays.asList(listItems));
+        return FXCollections.observableArrayList(list);
+    }
+
     //  Хайлтын оролт дээр үндэслэн бүтээгдэхүүнийг шүүж, ангилах
     public void addProductsSearch() {
         FilteredList<ProductData> filter = new FilteredList<>(addProductsList, e -> true);
@@ -600,6 +599,7 @@ public class DashboardController implements Initializable {
         addProducts_imageView.setImage(image);
         ListData.path = prodD.getImage();
     }
+
     // Өгөгдлийн санд шинэ хэрэглэгчийн захиалгыг нэмэх.
     public void ordersAdd() {
         // хэрэглэгчийн ID үүсгэх.
@@ -663,6 +663,7 @@ public class DashboardController implements Initializable {
         }
 
     }
+
     // Хэрэглэгчийн төлбөрийг боловсруулж, төлбөрийн баримтыг бүртгэх.
     public void ordersPay() {
         // хэрэглэгчийн ID үүсгэх.
@@ -702,6 +703,7 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
+
     // JasperReports ашиглан хэрэглэгчийн баримтыг үүсгэх.
     public void orderReceipt() {
         HashMap hash = new HashMap();
@@ -719,6 +721,7 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
+
     // Одоо байгаа хэрэглэгчийн бүх захиалгыг арилгана.
     public void ordersReset() {
         customerId();
@@ -774,6 +777,7 @@ public class DashboardController implements Initializable {
     }
 
     private double totalP;
+
     // Одоо байгаа хэрэглэгчийн бүх захиалгын нийт үнийг тооцоолж харуулна.
     public void ordersDisplayTotal() {
         customerId();
@@ -799,21 +803,13 @@ public class DashboardController implements Initializable {
     }
 
     public void ordersListType() {
-        List<String> listT = new ArrayList<>();
-
-        for (String data : ListData.listType) {
-            listT.add(data);
-        }
-
-        ObservableList listData = FXCollections.observableArrayList(listT);
-        orders_productType.setItems(listData);
+        orders_productType.setItems(addDataToList(ListData.listType));
         // Сонгосон төрлөөс хамааран брэндийн жагсаалтыг шинэчилнэ.
         ordersListBrand();
     }
 
     // Сонгосон бүтээгдэхүүний төрлөөс хамааран брэнд цэсийг дүүргэх
     public void ordersListBrand() {
-
         String sql = "SELECT brand FROM " + DB_TABLE_PRODUCT + " WHERE type = '"
                 + orders_productType.getSelectionModel().getSelectedItem()
                 + "' and status = 'Боломжтой' GROUP BY brand";

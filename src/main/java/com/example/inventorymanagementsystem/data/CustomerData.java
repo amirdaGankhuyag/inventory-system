@@ -15,13 +15,13 @@ public class CustomerData {
     /**
      * CustomerData объектын бүх талбарыг эхлүүлэх бүтээгч.
      *
-     * @param customerId Хэрэглэгчийн өвөрмөц ID.
-     * @param type Бүтээгдэхүүний төрөл (жишээ нь, зууш, ундаа).
-     * @param brand Бүтээгдэхүүний брэнд.
+     * @param customerId  Хэрэглэгчийн өвөрмөц ID.
+     * @param type        Бүтээгдэхүүний төрөл (жишээ нь, зууш, ундаа).
+     * @param brand       Бүтээгдэхүүний брэнд.
      * @param productName Бүтээгдэхүүний нэр.
-     * @param quantity Захиалсан бүтээгдэхүүний тоо хэмжээ.
-     * @param price Бүтээгдэхүүн эсвэл захиалгын нийт үнэ.
-     * @param date Захиалгын огноо.
+     * @param quantity    Захиалсан бүтээгдэхүүний тоо хэмжээ.
+     * @param price       Бүтээгдэхүүн эсвэл захиалгын нийт үнэ.
+     * @param date        Захиалгын огноо.
      **/
 
     public CustomerData(Integer customerId, String type, String brand, String productName, Integer quantity, Double price, Date date) {
@@ -33,10 +33,13 @@ public class CustomerData {
         this.price = price;
         this.date = date;
     }
+
     /**
-     Getters
+     * Getters
      **/
-    public Integer getCustomerId() { return customerId; }
+    public Integer getCustomerId() {
+        return customerId;
+    }
 
     public String getType() {
         return type;
@@ -46,7 +49,9 @@ public class CustomerData {
         return brand;
     }
 
-    public String getProductName() { return productName; }
+    public String getProductName() {
+        return productName;
+    }
 
     public Integer getQuantity() {
         return quantity;

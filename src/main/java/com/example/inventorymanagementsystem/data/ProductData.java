@@ -26,24 +26,31 @@ public class ProductData {
     public Integer getProductId() {
         return productId;
     }
+
     public String getType() {
         return type;
     }
+
     public String getBrand() {
         return brand;
     }
+
     public String getProductName() {
         return productName;
     }
+
     public Double getPrice() {
         return price;
     }
+
     public String getStatus() {
         return status;
     }
+
     public String getImage() {
         return image;
     }
+
     public Date getDate() {
         return date;
     }

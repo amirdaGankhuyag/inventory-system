@@ -55,7 +55,9 @@ public class MainController {
 
     private static final String DB_TABLE_USER = "user";
 
-    // хэрэглэгч нэвтрэх функц
+    /**
+     * хэрэглэгч нэвтрэх функц
+     */
     public void loginUser() {
         String selectData = "SELECT * FROM " + DB_TABLE_USER + " WHERE username = ? and password = ?";
         connect = Database.connectDB();
@@ -82,7 +84,6 @@ public class MainController {
 
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Dashboard.fxml")));
                 Stage stage = new Stage();
-                stage.setTitle("Бараа агуулахын систем | Админ хуудас");
                 Scene scene = new Scene(root);
 
                 root.setOnMousePressed((MouseEvent event) -> {
@@ -96,7 +97,6 @@ public class MainController {
                 });
 
                 stage.initStyle(StageStyle.TRANSPARENT);
-
                 stage.setScene(scene);
                 stage.show();
             } else { // Амжилтгүй болвол
@@ -107,7 +107,9 @@ public class MainController {
         }
     }
 
-    //хэрэглэгч шинээр бүртгүүлэх функц
+    /**
+     * хэрэглэгч шинээр бүртгүүлэх функц
+     */
     public void signupUser() {
         String selectData = "SELECT * FROM " + DB_TABLE_USER + " WHERE username = '" + signup_username.getText() + "'";
         connect = Database.connectDB();
@@ -138,7 +140,7 @@ public class MainController {
             alert.successMessage("Амжилттай бүртгэгдлээ. Нэвтэрч орно уу.");
             loginForm();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -152,6 +154,7 @@ public class MainController {
         signup_form.setVisible(true);
     }
 
-    // хаах улаан товч
-    public void close() { System.exit(0); }
+    public void close() {
+        System.exit(0);
+    }
 }
