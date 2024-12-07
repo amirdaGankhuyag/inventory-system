@@ -3,7 +3,6 @@ package com.example.inventorymanagementsystem.data;
 import java.sql.Date;
 
 public class CustomerData {
-
     private Integer customerId;
     private String type;
     private String brand;
@@ -13,9 +12,9 @@ public class CustomerData {
     private Date date;
 
     /**
-     * CustomerData объектын бүх талбарыг эхлүүлэх бүтээгч.
+     * CustomerData объектын бүх талбарыг эхлүүлэх байгуулагч.
      *
-     * @param customerId  Хэрэглэгчийн өвөрмөц ID.
+     * @param customerId  Хэрэглэгчийн ID.
      * @param type        Бүтээгдэхүүний төрөл (жишээ нь, зууш, ундаа).
      * @param brand       Бүтээгдэхүүний брэнд.
      * @param productName Бүтээгдэхүүний нэр.

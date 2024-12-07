@@ -39,6 +39,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.*;
 
+import static com.example.inventorymanagementsystem.data.ListData.*;
 
 /**
  * DashboardController нь dashboard UI болон backend хоорондын харилцан үйлчлэлийг удирдана.
@@ -47,10 +48,6 @@ import java.util.*;
  **/
 
 public class DashboardController implements Initializable {
-
-    @FXML
-    private Button addProducts_addBtn;
-
     @FXML
     private TextField addProducts_brand;
 
@@ -76,16 +73,10 @@ public class DashboardController implements Initializable {
     private TableColumn<ProductData, String> addProducts_col_type;
 
     @FXML
-    private Button addProducts_deleteBtn;
-
-    @FXML
     private AnchorPane addProducts_form;
 
     @FXML
     private ImageView addProducts_imageView;
-
-    @FXML
-    private Button addProducts_importBtn;
 
     @FXML
     private TextField addProducts_price;
@@ -100,9 +91,6 @@ public class DashboardController implements Initializable {
     private ComboBox<String> addProducts_productType;
 
     @FXML
-    private Button addProducts_resetBtn;
-
-    @FXML
     private TextField addProducts_search;
 
     @FXML
@@ -110,9 +98,6 @@ public class DashboardController implements Initializable {
 
     @FXML
     private TableView<ProductData> addProducts_tableView;
-
-    @FXML
-    private Button addProducts_updateBtn;
 
     @FXML
     private Label home_availableProducts;
@@ -172,9 +157,6 @@ public class DashboardController implements Initializable {
     private AnchorPane orders_form;
 
     @FXML
-    private Button orders_payBtn;
-
-    @FXML
     private ComboBox<String> orders_productName;
 
     @FXML
@@ -184,12 +166,6 @@ public class DashboardController implements Initializable {
     private Spinner<Integer> orders_quantity;
 
     @FXML
-    private Button orders_receiptBtn;
-
-    @FXML
-    private Button orders_resetBtn;
-
-    @FXML
     private TableView<CustomerData> orders_tableView;
 
     @FXML
@@ -197,9 +173,6 @@ public class DashboardController implements Initializable {
 
     @FXML
     private Label username;
-
-    @FXML
-    private Button orders_addBtn;
 
     // Database-тэй холбоотой хэрэглүүрүүд
     private Connection connect;
@@ -248,7 +221,7 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Нүүр хэсэгт нийт орлогын мэдээллийг харуулах функц
+     * Нүүр хэсэгт нийт орлогын мэдээллийг харуулах функц.
      */
     public void homeTotalIncome() {
         String selectData = "SELECT SUM(total) FROM " + DB_TABLE_CUST_RECEIPT + " ";
@@ -395,7 +368,9 @@ public class DashboardController implements Initializable {
         }
     }
 
-    //  Одоо байгаа бүтээгдэхүүнийг өөрчлөх
+    /**
+     * Одоо байгаа бүтээгдэхүүнийг шинэчлэх функц.
+     */
     public void addProductsUpdate() {
         String uri = ListData.path;
         uri = uri.replace("\\", "\\\\");
@@ -413,7 +388,9 @@ public class DashboardController implements Initializable {
         try {
             if (isInputValidOnProduct()) {
                 alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
-            } else if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг шинэчлэхдээ итгэлтэй байна уу?")) {
+            }
+
+            if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг шинэчлэхдээ итгэлтэй байна уу?")) {
                 statement = connect.createStatement();
                 statement.executeUpdate(sql);
 
@@ -427,7 +404,9 @@ public class DashboardController implements Initializable {
         }
     }
 
-    // Өгөгдлийн сангаас бүтээгдэхүүнийг устгах
+    /**
+     * Өгөгдлийн сангаас бүтээгдэхүүнийг устгах функц.
+     */
     public void addProductsDelete() {
         String sql = "DELETE FROM " + DB_TABLE_PRODUCT + " WHERE product_id = '" + addProducts_productId.getText() + "'";
         connect = Database.connectDB();
@@ -435,7 +414,9 @@ public class DashboardController implements Initializable {
         try {
             if (isInputValidOnProduct()) {
                 alert.errorMessage("Хоосон талбаруудыг бөглөнө үү!");
-            } else if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг устгахдаа итгэлтэй байна уу?")) {
+            }
+
+            if (alert.confirmMessage("Та " + addProducts_productId.getText() + " дугаартай барааг устгахдаа итгэлтэй байна уу?")) {
                 statement = connect.createStatement();
                 statement.executeUpdate(sql);
 
@@ -495,44 +476,54 @@ public class DashboardController implements Initializable {
      *
      * @param listItems нэмэх өгөгдлүүд
      */
-    public ObservableList addDataToList(String[] listItems){
+    public ObservableList addDataToList(String[] listItems) {
         List<String> list = new ArrayList<>(Arrays.asList(listItems));
         return FXCollections.observableArrayList(list);
     }
 
-    //  Хайлтын оролт дээр үндэслэн бүтээгдэхүүнийг шүүж, ангилах
+    /**
+     * Бараа хайх
+     */
     public void addProductsSearch() {
-        FilteredList<ProductData> filter = new FilteredList<>(addProductsList, e -> true);
+        FilteredList<ProductData> filteredList = new FilteredList<>(ListData.addProductsList, e -> true);
 
+        // search field listener
         addProducts_search.textProperty().addListener((Observable, oldValue, newValue) -> {
-            filter.setPredicate(predicateProductData -> {
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
+            String searchKey = (newValue == null || newValue.isEmpty()) ? "" : newValue.toLowerCase();
+
+            filteredList.setPredicate(product -> {
+                if (searchKey.isEmpty()) {
+                    return true; // Хоосон бол бүгдийг харуулна
                 }
-                String searchKey = newValue.toLowerCase();
-                if (predicateProductData.getProductId().toString().contains(searchKey)) {
-                    return true;
-                } else if (predicateProductData.getType().toLowerCase().contains(searchKey)) {
-                    return true;
-                } else if (predicateProductData.getBrand().toLowerCase().contains(searchKey)) {
-                    return true;
-                } else if (predicateProductData.getProductName().toLowerCase().contains(searchKey)) {
-                    return true;
-                } else if (predicateProductData.getPrice().toString().contains(searchKey)) {
-                    return true;
-                } else if (predicateProductData.getStatus().toLowerCase().contains(searchKey)) {
-                    return true;
-                } else return false;
+                return matchesSearch(product, searchKey);
             });
         });
 
-        SortedList<ProductData> sortList = new SortedList<>(filter);
+        SortedList<ProductData> sortedList = new SortedList<>(filteredList);
 
-        sortList.comparatorProperty().bind(addProducts_tableView.comparatorProperty());
-        addProducts_tableView.setItems(sortList);
+        sortedList.comparatorProperty().bind(addProducts_tableView.comparatorProperty());
+        addProducts_tableView.setItems(sortedList);
     }
 
-    // Бараа хүснэгтээс мэдээллүүдийг авч харгалзах загвар өгөгдөлд олгох
+    /**
+     * Хайсан бүтээгдэхүүн байгаа эсэхийг шалгах функц.
+     *
+     * @param product   Хайх бараанууд
+     * @param searchKey Хайх түлхүүр
+     * @return хайсан бараа байвал true буцаана
+     */
+    private boolean matchesSearch(ProductData product, String searchKey) {
+        return (product.getProductId().toString().contains(searchKey)
+                || product.getType().toLowerCase().contains(searchKey)
+                || product.getBrand().toLowerCase().contains(searchKey)
+                || product.getProductName().toLowerCase().contains(searchKey)
+                || product.getPrice().toString().contains(searchKey)
+                || product.getStatus().toLowerCase().contains(searchKey));
+    }
+
+    /**
+     * Бараа хүснэгтээс мэдээллүүдийг авч харгалзах загвар өгөгдөлд олгох
+     */
     public ObservableList<ProductData> addProductsListData() {
         ObservableList<ProductData> productList = FXCollections.observableArrayList();
 
@@ -564,11 +555,11 @@ public class DashboardController implements Initializable {
         return productList;
     }
 
-    private ObservableList<ProductData> addProductsList;
-
-    // Барааны мэдээллээр хүснэгтийн багануудыг дүүргэх
+    /**
+     * Барааны мэдээллээр хүснэгтийн багануудыг дүүргэх
+     */
     public void addProductsShowListData() {
-        addProductsList = addProductsListData();
+        ListData.addProductsList = addProductsListData();
 
         addProducts_col_productId.setCellValueFactory(new PropertyValueFactory<>("productId"));
         addProducts_col_type.setCellValueFactory(new PropertyValueFactory<>("type"));
@@ -577,10 +568,12 @@ public class DashboardController implements Initializable {
         addProducts_col_price.setCellValueFactory(new PropertyValueFactory<>("price"));
         addProducts_col_status.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        addProducts_tableView.setItems(addProductsList);
+        addProducts_tableView.setItems(ListData.addProductsList);
     }
 
-    // Хүснэгтэн дэх барааны мэдээлэл дээр дарахад дэлгэрэнгүйг харуулах функц
+    /**
+     * Хүснэгтэн дэх барааны мэдээлэл дээр дарахад дэлгэрэнгүйг харуулах функц.
+     */
     public void addProductsSelect() {
         ProductData prodD = addProducts_tableView.getSelectionModel().getSelectedItem();
         int num = addProducts_tableView.getSelectionModel().getSelectedIndex();
@@ -600,11 +593,12 @@ public class DashboardController implements Initializable {
         ListData.path = prodD.getImage();
     }
 
-    // Өгөгдлийн санд шинэ хэрэглэгчийн захиалгыг нэмэх.
+    /**
+     * Өгөгдлийн санд шинэ хэрэглэгчийн захиалгыг нэмэх.
+     */
     public void ordersAdd() {
-        // хэрэглэгчийн ID үүсгэх.
         customerId();
-        // өгөгдлийн сантай холбогдох
+
         String sql = "INSERT INTO " + DB_TABLE_CUSTOMER + " (customer_id, type, brand, product_name, quantity, price, date)"
                 + "VALUES(?,?,?,?,?,?,?)";
         connect = Database.connectDB();
@@ -627,7 +621,6 @@ public class DashboardController implements Initializable {
             // Тоо хэмжээнээс хамаарч нийт үнийг тооцоолно.
             double totalPData = (priceData * qty);
 
-
             // Хэрэглэгчийн оруулсан мэдээллийг баталгаажуулж, бүрэн бус захиалга хийхээс сэргийлнэ.
             if (orders_productType.getSelectionModel().getSelectedItem() == null
                     || orders_brand.getSelectionModel().getSelectedItem() == null
@@ -642,69 +635,64 @@ public class DashboardController implements Initializable {
                 prepare.setString(3, orders_brand.getSelectionModel().getSelectedItem());
                 prepare.setString(4, orders_productName.getSelectionModel().getSelectedItem());
                 prepare.setString(5, String.valueOf(qty));
-
-
                 prepare.setString(6, String.valueOf(totalPData));
-
-                Date date = new Date();
-                // Одоогийн огноог нэмнэ.
-                java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-                prepare.setString(7, String.valueOf(sqlDate));
-                // Insert query-г ажиллуулах
+                prepare.setString(7, String.valueOf(getSqlDate()));
                 prepare.executeUpdate();
+
                 // Захиалгын жагсаалтыг шинэчилнэ.
                 ordersShowListData();
                 // Нийт дүнг шинэчилнэ.
                 ordersDisplayTotal();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    // Хэрэглэгчийн төлбөрийг боловсруулж, төлбөрийн баримтыг бүртгэх.
+    /**
+     * Хэрэглэгчийн төлбөрийг боловсруулж, төлбөрийн баримтыг бүртгэх функц.
+     */
     public void ordersPay() {
-        // хэрэглэгчийн ID үүсгэх.
         customerId();
+
         String sql = "INSERT INTO " + DB_TABLE_CUST_RECEIPT + " (customer_id, total, amount, balance, date) " +
                 "VALUES (?,?,?,?,?)";
         connect = Database.connectDB();
 
         try {
-            if (totalP > 0 || orders_amount.getText().isEmpty() || amountP == 0) {
-                if (alert.confirmMessage("Та итгэлтэй байна уу?")) {
-                    prepare = connect.prepareStatement(sql);
-                    // Төлбөрийн дэлгэрэнгүй мэдээллийг тохируулна.
-                    prepare.setString(1, String.valueOf(ListData.customerId));
-                    prepare.setString(2, String.valueOf(totalP));
-                    prepare.setString(3, String.valueOf(amountP));
-                    prepare.setString(4, String.valueOf(balanceP));
-
-                    Date date = new Date();
-                    java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-                    prepare.setString(5, String.valueOf(sqlDate));
-                    // Төлбөрийн бүртгэл оруулах ажиллагааг гүйцэтгэнэ.
-                    prepare.executeUpdate();
-
-                    alert.successMessage("Амжилттай.");
-
-                    totalP = 0;
-                    balanceP = 0;
-                    amountP = 0;
-
-                    orders_balance.setText("0.0₮");
-                } else return;
-            } else {
-                alert.errorMessage("Invalid :>");
+            if (!(totalP > 0 || orders_amount.getText().isEmpty() || amountP == 0)) {
+                alert.errorMessage("Хүчингүй. Дахин шалгана уу.");
+                return;
             }
+
+            if (!alert.confirmMessage("Та итгэлтэй байна уу?")) {
+                return;
+            }
+
+            prepare = connect.prepareStatement(sql);
+            // Төлбөрийн дэлгэрэнгүй мэдээллийг тохируулна.
+            prepare.setString(1, String.valueOf(ListData.customerId));
+            prepare.setString(2, String.valueOf(totalP));
+            prepare.setString(3, String.valueOf(amountP));
+            prepare.setString(4, String.valueOf(balanceP));
+            prepare.setString(5, String.valueOf(getSqlDate()));
+            prepare.executeUpdate();
+
+            alert.successMessage("Амжилттай.");
+
+            // reset fields
+            totalP = 0;
+            balanceP = 0;
+            amountP = 0;
+            orders_balance.setText("0.0₮");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // JasperReports ашиглан хэрэглэгчийн баримтыг үүсгэх.
+    /**
+     * JasperReports ашиглан хэрэглэгчийн баримтыг үүсгэх функц.
+     */
     public void orderReceipt() {
         HashMap hash = new HashMap();
         // Баримтыг одоогийн хэрэглэгчийн ID-тай холбоно.
@@ -716,69 +704,74 @@ public class DashboardController implements Initializable {
             JasperPrint jPrint = JasperFillManager.fillReport(jReport, hash, connect);
             // report харуулах
             JasperViewer.viewReport(jPrint, false);
-
         } catch (JRException e) {
             e.printStackTrace();
         }
     }
 
-    // Одоо байгаа хэрэглэгчийн бүх захиалгыг арилгана.
+    /**
+     * Одоо байгаа хэрэглэгчийн бүх захиалгыг арилгах функц.
+     */
     public void ordersReset() {
         customerId();
+
         String sql = "DELETE FROM " + DB_TABLE_CUSTOMER + " WHERE customer_id = '" + ListData.customerId + "'";
         connect = Database.connectDB();
 
         try {
-            if (!orders_tableView.getItems().isEmpty()) {
-                if (alert.confirmMessage("Та дахин тохируулахдаа итгэлтэй байна уу?")) {
-                    statement = connect.createStatement();
-                    statement.executeUpdate(sql);
-
-                    ordersShowListData();
-
-                    balanceP = 0;
-                    amountP = 0;
-
-                    orders_balance.setText("0.0₮");
-                    orders_total.setText("0.0₮");
-                    orders_amount.setText("0.0₮");
-                }
+            if (orders_tableView.getItems().isEmpty()) {
+                alert.errorMessage("Захиалга олдсонгүй!");
+                return;
             }
+            if (!alert.confirmMessage("Та дахин тохируулахдаа итгэлтэй байна уу?")) {
+                return;
+            }
+
+            statement = connect.createStatement();
+            statement.executeUpdate(sql);
+
+            ordersShowListData();
+
+            balanceP = 0;
+            amountP = 0;
+            orders_balance.setText("0.0₮");
+            orders_total.setText("0.0₮");
+            orders_amount.setText("0.0₮");
+
+            alert.successMessage("Амжилттай дахин тохирууллаа.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private double amountP;
-    private double balanceP;
-
-    // Нийт үнэ болон оруулсан дүнгийн зөрүүг тооцоолсны дараа үлдэгдлийг шинэчилнэ
+    /**
+     *  Нийт үнэ болон оруулсан дүнгийн зөрүүг тооцоолсны дараа үлдэгдлийг шинэчилнэ
+     */
     public void ordersAmount() {
+        if (orders_amount.getText().isEmpty()) {
+            alert.errorMessage("Хэмжээгээ оруулна уу!");
+            return;
+        }
+
         amountP = Double.parseDouble(orders_amount.getText());
 
-        if (!orders_amount.getText().isEmpty()) {
-            if (totalP > 0) {
-                if (amountP >= totalP) {
-                    balanceP = (amountP - totalP);
+        if (totalP <= 0) {
+            alert.errorMessage("Нийт үнэ 0-с их байх ёстой!");
+            return;
+        }
 
-                    orders_balance.setText(String.valueOf(balanceP) + "₮");
-
-                } else {
-                    alert.errorMessage("Invalid :3");
-
-                    orders_amount.setText("");
-                }
-            } else {
-                alert.errorMessage("Invalid :>");
-            }
+        if (amountP >= totalP) {
+            balanceP = amountP - totalP;
+            orders_balance.setText(balanceP + "₮");
         } else {
-            alert.errorMessage("Invalid :>");
+            alert.errorMessage("Хангалтгүй дүн. Хүчинтэй төлбөр оруулна уу!");
+            orders_amount.setText("");
         }
     }
 
-    private double totalP;
-
-    // Одоо байгаа хэрэглэгчийн бүх захиалгын нийт үнийг тооцоолж харуулна.
+    /**
+     * Одоо байгаа хэрэглэгчийн бүх захиалгын нийт үнийг тооцоолж харуулах функц.
+     */
     public void ordersDisplayTotal() {
         customerId();
 
@@ -808,7 +801,9 @@ public class DashboardController implements Initializable {
         ordersListBrand();
     }
 
-    // Сонгосон бүтээгдэхүүний төрлөөс хамааран брэнд цэсийг дүүргэх
+    /**
+     * Сонгосон бүтээгдэхүүний төрлөөс хамааран брэнд цэсийг дүүргэх
+     */
     public void ordersListBrand() {
         String sql = "SELECT brand FROM " + DB_TABLE_PRODUCT + " WHERE type = '"
                 + orders_productType.getSelectionModel().getSelectedItem()
@@ -834,7 +829,9 @@ public class DashboardController implements Initializable {
         }
     }
 
-    // Сонгосон брэнд дээр үндэслэсэн бүтээгдэхүүний нэр цэсийг дүүргэх
+    /**
+     * Сонгосон брэнд дээр үндэслэсэн бүтээгдэхүүний нэр цэсийг дүүргэх функц.
+     */
     public void ordersListProductName() {
         String sql = "SELECT product_name FROM " + DB_TABLE_PRODUCT + " WHERE brand = '"
                 + orders_brand.getSelectionModel().getSelectedItem() + "'";
@@ -857,23 +854,24 @@ public class DashboardController implements Initializable {
         }
     }
 
-    private SpinnerValueFactory<Integer> spinner;
-
-    // Тоо хэмжээний spinner control
+    /**
+     * Тоо хэмжээний spinner control
+     */
     public void ordersSpinner() {
         spinner = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0);
-
         orders_quantity.setValueFactory(spinner);
     }
 
-    private int qty;
-
-    // Spinner control-оос утгыг авах
+    /**
+     * Spinner control-оос утгыг авах.
+     */
     public void ordersShowSpinnerValue() {
         qty = orders_quantity.getValue();
     }
 
-    // Одоо байгаа хэрэглэгчдийн бүх захиалгыг өгөгдлийн сангаас татах.
+    /**
+     * Одоо байгаа хэрэглэгчдийн бүх захиалгыг өгөгдлийн сангаас татах.
+     */
     public ObservableList<CustomerData> ordersListData() {
         customerId();
 
@@ -898,35 +896,31 @@ public class DashboardController implements Initializable {
 
                 listData.add(customerD);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return listData;
     }
 
-    private ObservableList<CustomerData> ordersList;
-
-    // Захиалгын өгөгдлийг TableView харуулах
+    /**
+     * Захиалгын өгөгдлийг TableView харуулах
+     */
     public void ordersShowListData() {
         ordersList = ordersListData();
 
         orders_col_type.setCellValueFactory(new PropertyValueFactory<>("type"));
-
         orders_col_brand.setCellValueFactory(new PropertyValueFactory<>("brand"));
-
         orders_col_productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
-
         orders_col_quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-
         orders_col_price.setCellValueFactory(new PropertyValueFactory<>("price"));
-
 
         ordersDisplayTotal();
         orders_tableView.setItems(ordersList);
     }
 
-    // Хэрэглэгчийн ID үүсгэх
+    /**
+     * Хэрэглэгчийн ID үүсгэх функц.
+     */
     public void customerId() {
         String custId = "SELECT * FROM " + DB_TABLE_CUSTOMER + " ";
         connect = Database.connectDB();
@@ -940,7 +934,7 @@ public class DashboardController implements Initializable {
 
             while (result.next()) {
                 // Сүүлийн customer id-г авах
-                ListData.customerId = result.getInt("customer_id");
+                customerId = result.getInt("customer_id");
             }
 
             String checkData = "SELECT * FROM " + DB_TABLE_CUST_RECEIPT + " ";
@@ -953,19 +947,20 @@ public class DashboardController implements Initializable {
 
             statement = connect.createStatement();
 
-            if (ListData.customerId == 0) {
-                ListData.customerId += 1;
-            } else if (checkId == ListData.customerId) {
-                ListData.customerId += 1;
+            if (customerId == 0) {
+                customerId += 1;
             }
-
+            if (checkId == customerId) {
+                customerId += 1;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    // Home, products, order формуудын хооронд шилжинэ.
+    /**
+     * Home, products, order формуудын хооронд шилжинэ.
+     */
     public void switchForm(ActionEvent event) {
         if (event.getSource() == home_btn) {
             home_form.setVisible(true);
@@ -1020,42 +1015,41 @@ public class DashboardController implements Initializable {
         home_btn.setStyle("-fx-background-color: #fff;");
     }
 
-    private double x = 0;
-    private double y = 0;
-
-    // Хэрэглэгчийг системээс гаргана.
+    /**
+     * Хэрэглэгчийг системээс гаргана.
+     */
     public void logout() {
+        if (!(alert.confirmMessage("Та гарахдаа итгэлтэй байна уу?"))) {
+            return;
+        }
+
         try {
-            if (alert.confirmMessage("Та гарахдаа итгэлтэй байна уу?")) {
-                // gol formoo hide hiih
-                logout.getScene().getWindow().hide();
+            // gol formoo hide hiih
+            logout.getScene().getWindow().hide();
 
-                // login form oo holboh
-                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("LoginSignup.fxml")));
-                Stage stage = new Stage();
-                Scene scene = new Scene(root);
+            // login form oo holboh
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("LoginSignup.fxml")));
+            Stage stage = new Stage();
+            Scene scene = new Scene(root);
 
-                root.setOnMousePressed((MouseEvent event) -> {
-                    x = event.getSceneX();
-                    y = event.getSceneY();
-                });
-                root.setOnMouseDragged((MouseEvent event) -> {
-                    stage.setX(event.getScreenX() - x);
-                    stage.setY(event.getScreenY() - y);
+            root.setOnMousePressed((MouseEvent event) -> {
+                x = event.getSceneX();
+                y = event.getSceneY();
+            });
+            root.setOnMouseDragged((MouseEvent event) -> {
+                stage.setX(event.getScreenX() - x);
+                stage.setY(event.getScreenY() - y);
 
-                    stage.setOpacity(0.8);
-                });
-                root.setOnMouseReleased((MouseEvent event) -> {
-                    stage.setOpacity(1);
-                });
+                stage.setOpacity(0.8);
+            });
+            root.setOnMouseReleased((MouseEvent event) -> {
+                stage.setOpacity(1);
+            });
 
-                stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initStyle(StageStyle.TRANSPARENT);
 
-                stage.setScene(scene);
-                stage.show();
-
-            } else return;
-
+            stage.setScene(scene);
+            stage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1074,7 +1068,9 @@ public class DashboardController implements Initializable {
         System.exit(0);
     }
 
-    // Эхлэх үед dashboard-ийн үндсэн төлөвийг тохируулна.
+    /**
+     * Эхлэх үед dashboard-ийн үндсэн төлөвийг тохируулна.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         defaultNav();

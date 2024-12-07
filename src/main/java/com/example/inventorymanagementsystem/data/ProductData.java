@@ -12,6 +12,19 @@ public class ProductData {
     private String image;
     private Date date;
 
+    /**
+     * ProductData объект нь барааны мэдээллийг илэрхийлнэ.
+     *
+     * @param productId   Барааны ID.
+     * @param type        Бүтээгдэхүүний төрөл (жишээ нь, зууш, ундаа).
+     * @param brand       Бүтээгдэхүүний брэнд.
+     * @param productName Бүтээгдэхүүний нэр.
+     * @param price       Бүтээгдэхүүн эсвэл захиалгын нийт үнэ.
+     * @param status      Барааны төлөв.
+     * @param image       Барааны зураг
+     * @param date        Захиалгын огноо.
+     **/
+
     public ProductData(Integer productId, String type, String brand, String productName, Double price, String status, String image, Date date) {
         this.productId = productId;
         this.type = type;
