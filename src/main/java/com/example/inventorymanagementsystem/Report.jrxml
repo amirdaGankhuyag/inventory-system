@@ -1,6 +1,6 @@
 <!-- Created with Jaspersoft Studio version 7.0.1.final using JasperReports Library version 7.0.1-573496633c2b4074e32f433154b543003f7d2498  -->
 <jasperReport name="Blank_A4" language="java" columnCount="1" pageWidth="226" pageHeight="425" orientation="Landscape" columnWidth="186" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="66e81c9e-50de-498d-a5cf-80f88ec343a3">
-    <property name="com.jaspersoft.studio.data.sql.tables" value="aW52ZW50b3J5LmN1c3RvbWVyICwxNjYsMTUsZWU4MGNkYzMtZGYzYS00YTFmLTg5MTItYzhiNDYz&#xa;MDI5YTUwO2ludmVudG9yeS5jdXN0b21lcl9yZWNlaXB0ICwxNSw0NixhMTk5MTkxMy0zOWZlLTQ3&#xa;YjMtYWY0My00NjdmNDk3NjRmZmI7"/>
+    <property name="com.jaspersoft.studio.data.sql.tables" value=""/>
     <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="475"/>
     <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="525"/>
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="inventorySystem"/>
@@ -22,12 +22,12 @@
 	inventory.customer.quantity,
 	inventory.customer.price,
 	inventory.customer.date,
-	inventory.customer_receipt.id,
-	inventory.customer_receipt.customer_id,
-	inventory.customer_receipt.total,
-	inventory.customer_receipt.amount,
-	inventory.customer_receipt.balance,
-	inventory.customer_receipt.date
+	inventory.customer_receipt.id AS customer_receipt_id,
+	inventory.customer_receipt.customer_id AS customer_receipt_customer_id,
+	inventory.customer_receipt.total AS customer_receipt_total,
+	inventory.customer_receipt.amount AS customer_receipt_amount,
+	inventory.customer_receipt.balance AS customer_receipt_balance,
+	inventory.customer_receipt.date AS customer_receipt_date
 FROM inventory.customer
 	INNER JOIN inventory.customer_receipt ON
 	 inventory.customer_receipt.customer_id = inventory.customer.customer_id
