@@ -811,6 +811,7 @@ public class DashboardController implements Initializable {
         connect = Database.connectDB();
 
         try {
+            assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
@@ -838,6 +839,7 @@ public class DashboardController implements Initializable {
         connect = Database.connectDB();
 
         try {
+            assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
