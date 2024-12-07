@@ -35,6 +35,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.*;
 
+
+/**
+ * DashboardController нь dashboard UI болон backend хоорондын харилцан үйлчлэлийг удирдана.
+
+ * Энэ нь статистик мэдээллийг харуулах, бүтээгдэхүүнтэй харьцах, захиалгыг удирдах функцуудыг агуулдаг.
+ **/
+
 public class DashboardController implements Initializable {
 
     @FXML
@@ -221,7 +228,7 @@ public class DashboardController implements Initializable {
             while (result.next()) {
                 countOrders = result.getInt("COUNT(id)");
             }
-
+            // Нийт захиалгын тоог харуулахын тулд label-ийг шинэчилнэ.
             home_numberOrder.setText(String.valueOf(countOrders));
         } catch (Exception e) {
             e.printStackTrace();
@@ -242,12 +249,16 @@ public class DashboardController implements Initializable {
             while (result.next()) {
                 totalIncome = result.getDouble("SUM(total)");
             }
-
+            // Нийт орлогын label-ийг тооцоолсон утгаар шинэчилнэ.
             home_totalIncome.setText(String.valueOf(totalIncome) + "₮");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+/**
+ * Боломжтой бүтээгдэхүүний нийт тоог харуулна.
+ **/
 
     public void homeAvailableProduncts() {
         String sql = "SELECT COUNT(id) FROM product WHERE status = 'Боломжтой'";
@@ -262,13 +273,13 @@ public class DashboardController implements Initializable {
             while (result.next()) {
                 countAP = result.getInt("COUNT(id)");
             }
-
+            // Боломжтой бүтээгдэхүүний тоог харуулахын тулд label-ийг шинэчилнэ.
             home_availableProducts.setText(String.valueOf(countAP));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    // Өдөр тутмын орлогын trend-ийг график дээр харуулна.
     public void homeIncomeChart() {
         home_incomeChart.getData().clear();
 
@@ -290,7 +301,7 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    // Захиалгын trend-ийг огноогоор харуулна.
     public void homeOrdersChart() {
         home_orderChart.getData().clear();
         String sql = "SELECT date, COUNT(id) FROM customer GROUP BY date ORDER BY TIMESTAMP(date) ASC LIMIT 5";
@@ -377,7 +388,7 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    //  Одоо байгаа бүтээгдэхүүнийг өөрчлөх
     public void addProductsUpdate() {
         String uri = ListData.path;
         uri = uri.replace("\\", "\\\\");
@@ -434,7 +445,7 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    // Өгөгдлийн сангаас бүтээгдэхүүнийг устгах
     public void addProductsDelete() {
         String sql = "DELETE FROM product WHERE product_id = '" + addProducts_productId.getText() + "'";
 
@@ -478,7 +489,7 @@ public class DashboardController implements Initializable {
         }
     }
 
-    // формыг цэвэрлэх функц
+    // Формыг цэвэрлэх функц
     public void addProductsReset() {
         addProducts_productId.setText("");
         addProducts_productType.getSelectionModel().clearSelection();
@@ -522,7 +533,7 @@ public class DashboardController implements Initializable {
         ObservableList listData = FXCollections.observableArrayList(listS);
         addProducts_status.setItems(listData);
     }
-
+    //  Хайлтын оролт дээр үндэслэн бүтээгдэхүүнийг шүүж, ангилах
     public void addProductsSearch() {
         FilteredList<ProductData> filter = new FilteredList<>(addProductsList, e -> true);
 
@@ -621,11 +632,11 @@ public class DashboardController implements Initializable {
         addProducts_imageView.setImage(image);
         ListData.path = prodD.getImage();
     }
-
+    // Өгөгдлийн санд шинэ хэрэглэгчийн захиалгыг нэмэх.
     public void ordersAdd() {
-
+        // хэрэглэгчийн ID үүсгэх.
         customerId();
-
+        // өгөгдлийн сантай холбогдох
         String sql = "INSERT INTO customer (customer_id, type, brand, product_name, quantity, price, date)"
                 + "VALUES(?,?,?,?,?,?,?)";
 
@@ -640,17 +651,19 @@ public class DashboardController implements Initializable {
             double priceData = 0;
 
             statement = connect.createStatement();
+            // Бүтээгдэхүүний нэрээр бүтээгдэхүүний дэлгэрэнгүй мэдээллийг авна.
             result = statement.executeQuery(checkData);
 
-
             if (result.next()) {
+                // Бүтээгдэхүүний үнийг fetch хийнэ.
                 priceData = result.getDouble("price");
             }
 
+            // Тоо хэмжээнээс хамаарч нийт үнийг тооцоолно.
             double totalPData = (priceData * qty);
 
             Alert alert;
-
+            // Хэрэглэгчийн оруулсан мэдээллийг баталгаажуулж, бүрэн бус захиалга хийхээс сэргийлнэ.
             if (orders_productType.getSelectionModel().getSelectedItem() == null
                     || orders_brand.getSelectionModel().getSelectedItem() == null
                     || orders_productName.getSelectionModel().getSelectedItem() == null
@@ -662,6 +675,7 @@ public class DashboardController implements Initializable {
                 alert.showAndWait();
             } else {
                 prepare = connect.prepareStatement(sql);
+                // SQL параметрийн утгыг тохируулна.
                 prepare.setString(1, String.valueOf(ListData.customerId));
                 prepare.setString(2, orders_productType.getSelectionModel().getSelectedItem());
                 prepare.setString(3, orders_brand.getSelectionModel().getSelectedItem());
@@ -672,12 +686,14 @@ public class DashboardController implements Initializable {
                 prepare.setString(6, String.valueOf(totalPData));
 
                 Date date = new Date();
+                // Одоогийн огноог нэмнэ.
                 java.sql.Date sqlDate = new java.sql.Date(date.getTime());
                 prepare.setString(7, String.valueOf(sqlDate));
-
+                // Insert query-г ажиллуулах
                 prepare.executeUpdate();
-
+                // Захиалгын жагсаалтыг шинэчилнэ.
                 ordersShowListData();
+                // Нийт дүнг шинэчилнэ.
                 ordersDisplayTotal();
             }
 
@@ -686,8 +702,9 @@ public class DashboardController implements Initializable {
         }
 
     }
-
+    // Хэрэглэгчийн төлбөрийг боловсруулж, төлбөрийн баримтыг бүртгэх.
     public void ordersPay() {
+        // хэрэглэгчийн ID үүсгэх.
         customerId();
         String sql = "INSERT INTO customer_receipt (customer_id, total, amount, balance, date) " +
                 "VALUES (?,?,?,?,?)";
@@ -696,8 +713,9 @@ public class DashboardController implements Initializable {
 
         try {
             Alert alert;
-
+            // Төлбөрийн оролтыг баталгаажуулж, бүрэн бус ажиллагаанаас сэргийлнэ.
             if (totalP > 0 || orders_amount.getText().isEmpty() || amountP == 0) {
+                // Хэрэглэгчтэй хийсэн төлбөрийн үйлдлийг баталгаажуулна.
                 alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Баталгаажуулах мэдэгдэл");
                 alert.setHeaderText(null);
@@ -706,6 +724,7 @@ public class DashboardController implements Initializable {
 
                 if (option.get().equals(ButtonType.OK)) {
                     prepare = connect.prepareStatement(sql);
+                    // Төлбөрийн дэлгэрэнгүй мэдээллийг тохируулна.
                     prepare.setString(1, String.valueOf(ListData.customerId));
                     prepare.setString(2, String.valueOf(totalP));
                     prepare.setString(3, String.valueOf(amountP));
@@ -714,7 +733,7 @@ public class DashboardController implements Initializable {
                     Date date = new Date();
                     java.sql.Date sqlDate = new java.sql.Date(date.getTime());
                     prepare.setString(5, String.valueOf(sqlDate));
-
+                    // Төлбөрийн бүртгэл оруулах ажиллагааг гүйцэтгэнэ.
                     prepare.executeUpdate();
 
                     alert = new Alert(Alert.AlertType.INFORMATION);
@@ -722,7 +741,7 @@ public class DashboardController implements Initializable {
                     alert.setHeaderText(null);
                     alert.setContentText("Амжилттай.");
                     alert.showAndWait();
-
+                    // Төлбөрийн утгыг reset хийнэ.
                     totalP = 0;
                     balanceP = 0;
                     amountP = 0;
@@ -740,23 +759,24 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    // JasperReports ашиглан хэрэглэгчийн баримтыг үүсгэх.
     public void orderReceipt() {
         HashMap hash = new HashMap();
+        // Баримтыг одоогийн хэрэглэгчийн ID-тай холбоно.
         hash.put("inventoryP", ListData.customerId);
         try {
-
+            // Jasper загварыг ажиллуулах
             JasperDesign jDesign = JRXmlLoader.load("C:\\Users\\Dell\\Documents\\24-25 FALL\\Software Development\\Lab\\InventoryManagementSystem\\src\\main\\java\\com\\example\\inventorymanagementsystem\\Report.jrxml");
             JasperReport jReport = JasperCompileManager.compileReport(jDesign);
             JasperPrint jPrint = JasperFillManager.fillReport(jReport, hash, connect);
-
+            // report харуулах
             JasperViewer.viewReport(jPrint, false);
 
         } catch (JRException e) {
             e.printStackTrace();
         }
     }
-
+    // Одоо байгаа хэрэглэгчийн бүх захиалгыг арилгана.
     public void ordersReset() {
         customerId();
         String sql = "DELETE FROM customer WHERE customer_id = '" + ListData.customerId + "'";
@@ -792,6 +812,7 @@ public class DashboardController implements Initializable {
     private double amountP;
     private double balanceP;
 
+    // Нийт үнэ болон оруулсан дүнгийн зөрүүг тооцоолсны дараа үлдэгдлийг шинэчилнэ
     public void ordersAmount() {
         Alert alert;
 
@@ -828,7 +849,7 @@ public class DashboardController implements Initializable {
     }
 
     private double totalP;
-
+    // Одоо байгаа хэрэглэгчийн бүх захиалгын нийт үнийг тооцоолж харуулна.
     public void ordersDisplayTotal() {
         customerId();
 
@@ -842,9 +863,10 @@ public class DashboardController implements Initializable {
 
 
             while (result.next()) {
+                // захиалгын нийт үнийг нэгтгэн гаргана.
                 totalP = result.getDouble("SUM(price)");
             }
-
+            // Нийт үнийг шинэчилнэ.
             orders_total.setText(String.valueOf(totalP) + "₮");
 
 
@@ -857,6 +879,7 @@ public class DashboardController implements Initializable {
 
     private String[] orderListType = {"Зууш", "Ундаа", "Десерт", "Хувийн бараа", "Бусад"};
 
+    // Боломжтой бүтээгдэхүүний нэрсийн жагсаалтыг дүүргэх
     public void ordersListType() {
         List<String> listT = new ArrayList<>();
 
@@ -866,11 +889,11 @@ public class DashboardController implements Initializable {
 
         ObservableList listData = FXCollections.observableArrayList(listT);
         orders_productType.setItems(listData);
-
+        // Сонгосон төрлөөс хамааран брэндийн жагсаалтыг шинэчилнэ.
         ordersListBrand();
     }
 
-
+    // Сонгосон бүтээгдэхүүний төрлөөс хамааран брэнд цэсийг дүүргэх
     public void ordersListBrand() {
 
         String sql = "SELECT brand FROM product WHERE type = '"
@@ -886,11 +909,12 @@ public class DashboardController implements Initializable {
             ObservableList listData = FXCollections.observableArrayList();
 
             while (result.next()) {
+                // Сонгосон төрлөөр боломжтой брэндүүдийг fetch хийх.
                 listData.add(result.getString("brand"));
             }
 
             orders_brand.setItems(listData);
-
+            // Сонгосон брэнд дээр үндэслэн бүтээгдэхүүний жагсаалтыг шинэчилнэ.
             ordersListProductName();
 
         } catch (Exception e) {
@@ -898,7 +922,7 @@ public class DashboardController implements Initializable {
         }
     }
 
-
+    // Сонгосон брэнд дээр үндэслэсэн бүтээгдэхүүний нэр цэсийг дүүргэх
     public void ordersListProductName() {
 
         String sql = "SELECT product_name FROM product WHERE brand = '"
@@ -925,7 +949,7 @@ public class DashboardController implements Initializable {
     }
 
     private SpinnerValueFactory<Integer> spinner;
-
+    // Тоо хэмжээний spinner control
     public void ordersSpinner() {
         spinner = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0);
 
@@ -933,12 +957,12 @@ public class DashboardController implements Initializable {
     }
 
     private int qty;
-
+    // Spinner control-оос утгыг авах
     public void ordersShowSpinnerValue() {
         qty = orders_quantity.getValue();
     }
 
-
+    // Одоо байгаа хэрэглэгчдийн бүх захиалгыг өгөгдлийн сангаас татах.
     public ObservableList<CustomerData> ordersListData() {
 
         customerId();
@@ -972,7 +996,7 @@ public class DashboardController implements Initializable {
     }
 
     private ObservableList<CustomerData> ordersList;
-
+    // Захиалгын өгөгдлийг TableView харуулах
     public void ordersShowListData() {
         ordersList = ordersListData();
 
@@ -991,7 +1015,7 @@ public class DashboardController implements Initializable {
         orders_tableView.setItems(ordersList);
     }
 
-
+    // Хэрэглэгчийн ID үүсгэх
     public void customerId() {
 
         String customId = "SELECT * FROM customer";
@@ -1032,7 +1056,7 @@ public class DashboardController implements Initializable {
 
     }
 
-
+    // Home, products, order формуудын хооронд шилжинэ.
     public void switchForm(ActionEvent event) {
         if (event.getSource() == home_btn) {
             home_form.setVisible(true);
@@ -1087,7 +1111,7 @@ public class DashboardController implements Initializable {
 
     private double x = 0;
     private double y = 0;
-
+    // Хэрэглэгчийг системээс гаргана.
     public void logout() {
         try {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -1143,7 +1167,7 @@ public class DashboardController implements Initializable {
     public void close() {
         System.exit(0);
     }
-
+    // Эхлэх үед dashboard-ийн үндсэн төлөвийг тохируулна.
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         defaultNav();
@@ -1156,7 +1180,7 @@ public class DashboardController implements Initializable {
         homeIncomeChart();
         homeOrdersChart();
 
-        // TableView deer bga data g haruulah
+        // TableView дээр байгаа датаг харуулах
         addProductsShowListData();
         addProductsListStatus();
         addProductsListType();
