@@ -1,7 +1,5 @@
-package com.example.inventorymanagementsystem.controller;
+package com.example.inventorymanagementsystem;
 
-import com.example.inventorymanagementsystem.AlertMessage;
-import com.example.inventorymanagementsystem.Database;
 import com.example.inventorymanagementsystem.data.CustomerData;
 import com.example.inventorymanagementsystem.data.ListData;
 import com.example.inventorymanagementsystem.data.ProductData;
@@ -117,9 +115,6 @@ public class DashboardController implements Initializable {
     private Button addProducts_updateBtn;
 
     @FXML
-    private Button close;
-
-    @FXML
     private Label home_availableProducts;
 
     @FXML
@@ -145,9 +140,6 @@ public class DashboardController implements Initializable {
 
     @FXML
     private AnchorPane main_form;
-
-    @FXML
-    private Button minimize;
 
     @FXML
     private TextField orders_amount;
@@ -217,6 +209,10 @@ public class DashboardController implements Initializable {
 
     private Image image;
 
+    private static final String DB_TABLE_CUSTOMER = "customer";
+    private static final String DB_TABLE_CUST_RECEIPT = "customer_receipt";
+    private static final String DB_TABLE_PRODUCT = "product";
+
     AlertMessage alert = new AlertMessage();
 
     // Нүүр хэсэгт нийт захиалгын тоог харуулах функц
@@ -224,14 +220,14 @@ public class DashboardController implements Initializable {
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 
-        String sql = "SELECT COUNT(id) FROM customer WHERE date = '" + sqlDate + "'";
+        String count = "SELECT COUNT(id) FROM " + DB_TABLE_CUSTOMER + " WHERE date = '" + sqlDate + "'";
         connect = Database.connectDB();
 
         int countOrders = 0;
 
         try {
             assert connect != null;
-            prepare = connect.prepareStatement(sql);
+            prepare = connect.prepareStatement(count);
             result = prepare.executeQuery();
 
             while (result.next()) {
@@ -240,43 +236,43 @@ public class DashboardController implements Initializable {
             // Нийт захиалгын тоог харуулахын тулд label-ийг шинэчилнэ.
             home_numberOrder.setText(String.valueOf(countOrders));
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
     // Нүүр хэсэгт нийт орлогын мэдээллийг харуулах функц
     public void homeTotalIncome() {
-        String sql = "SELECT SUM(total) FROM customer_receipt";
+        String selectData = "SELECT SUM(total) FROM " + DB_TABLE_CUST_RECEIPT + " ";
         connect = Database.connectDB();
 
         double totalIncome = 0;
 
         try {
             assert connect != null;
-            prepare = connect.prepareStatement(sql);
+            prepare = connect.prepareStatement(selectData);
             result = prepare.executeQuery();
 
             while (result.next()) {
                 totalIncome = result.getDouble("SUM(total)");
             }
             // Нийт орлогын label-ийг тооцоолсон утгаар шинэчилнэ.
-            home_totalIncome.setText(String.valueOf(totalIncome) + "₮");
+            home_totalIncome.setText(totalIncome + "₮");
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
-/**
- * Боломжтой бүтээгдэхүүний нийт тоог харуулна.
- **/
-
-    public void homeAvailableProduncts() {
-        String sql = "SELECT COUNT(id) FROM product WHERE status = 'Боломжтой'";
+    /**
+    * Боломжтой бүтээгдэхүүний нийт тоог харуулна.
+     **/
+    public void homeAvailableProducts() {
+        String sql = "SELECT COUNT(id) FROM " + DB_TABLE_PRODUCT + " WHERE status = 'Боломжтой'";
         connect = Database.connectDB();
 
         int countAP = 0;
 
         try {
+            assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
@@ -289,16 +285,16 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
+
     // Өдөр тутмын орлогын trend-ийг график дээр харуулна.
     public void homeIncomeChart() {
         home_incomeChart.getData().clear();
 
-        String sql = "SELECT date, SUM(total) FROM customer_receipt GROUP BY TIMESTAMP(date) ASC LIMIT 6";
+        String sql = "SELECT date, SUM(total) FROM " + DB_TABLE_CUST_RECEIPT + " GROUP BY TIMESTAMP(date) ASC LIMIT 6";
         connect = Database.connectDB();
+        XYChart.Series chart = new XYChart.Series();
 
         try {
-            XYChart.Series chart = new XYChart.Series();
-
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
@@ -314,12 +310,11 @@ public class DashboardController implements Initializable {
     // Захиалгын trend-ийг огноогоор харуулна.
     public void homeOrdersChart() {
         home_orderChart.getData().clear();
-        String sql = "SELECT date, COUNT(id) FROM customer GROUP BY date ORDER BY TIMESTAMP(date) ASC LIMIT 5";
+        String sql = "SELECT date, COUNT(id) FROM " + DB_TABLE_CUSTOMER + " GROUP BY date ORDER BY TIMESTAMP(date) ASC LIMIT 5";
         connect = Database.connectDB();
+        XYChart.Series chart = new XYChart.Series();
 
         try {
-            XYChart.Series chart = new XYChart.Series();
-
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
 
@@ -331,12 +326,11 @@ public class DashboardController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     // Database-д бараа нэмэх функц
     public void addProductsAdd() {
-        String sql = "INSERT INTO product (product_id, type, brand, product_name, price, status, image, date) "
+        String sql = "INSERT INTO " + DB_TABLE_PRODUCT + " (product_id, type, brand, product_name, price, status, image, date) "
                 + "VALUES(?,?,?,?,?,?,?,?)";
         connect = Database.connectDB();
 
@@ -354,7 +348,7 @@ public class DashboardController implements Initializable {
                 // Алдаагүй үед
 
                 // Тухайн ID-тай бараа аль хэдийн байгаа эсэхийг шалгана
-                String checkData = "SELECT product_id FROM product WHERE product_id = '" + addProducts_productId.getText() + "'";
+                String checkData = "SELECT product_id FROM " + DB_TABLE_PRODUCT + " WHERE product_id = '" + addProducts_productId.getText() + "'";
                 statement = connect.createStatement();
                 result = statement.executeQuery(checkData);
 
@@ -397,7 +391,7 @@ public class DashboardController implements Initializable {
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 
-        String sql = "UPDATE product SET " +
+        String sql = "UPDATE " + DB_TABLE_PRODUCT + " SET " +
                 "type = '" + addProducts_productType.getSelectionModel().getSelectedItem()
                 + "', brand = '" + addProducts_brand.getText()
                 + "', product_name = '" + addProducts_productName.getText()
@@ -435,7 +429,7 @@ public class DashboardController implements Initializable {
     }
     // Өгөгдлийн сангаас бүтээгдэхүүнийг устгах
     public void addProductsDelete() {
-        String sql = "DELETE FROM product WHERE product_id = '" + addProducts_productId.getText() + "'";
+        String sql = "DELETE FROM " + DB_TABLE_PRODUCT + " WHERE product_id = '" + addProducts_productId.getText() + "'";
 
         connect = Database.connectDB();
         try {
@@ -543,7 +537,7 @@ public class DashboardController implements Initializable {
     public ObservableList<ProductData> addProductsListData() {
         ObservableList<ProductData> productList = FXCollections.observableArrayList();
 
-        String sql = "SELECT * FROM product";
+        String sql = "SELECT * FROM " + DB_TABLE_PRODUCT + " ";
         connect = Database.connectDB();
 
         try {
@@ -611,15 +605,12 @@ public class DashboardController implements Initializable {
         // хэрэглэгчийн ID үүсгэх.
         customerId();
         // өгөгдлийн сантай холбогдох
-        String sql = "INSERT INTO customer (customer_id, type, brand, product_name, quantity, price, date)"
+        String sql = "INSERT INTO " + DB_TABLE_CUSTOMER + " (customer_id, type, brand, product_name, quantity, price, date)"
                 + "VALUES(?,?,?,?,?,?,?)";
-
         connect = Database.connectDB();
 
-
         try {
-
-            String checkData = "SELECT * FROM product WHERE product_name = '"
+            String checkData = "SELECT * FROM " + DB_TABLE_PRODUCT + " WHERE product_name = '"
                     + orders_productName.getSelectionModel().getSelectedItem() + "'";
 
             double priceData = 0;
@@ -676,13 +667,11 @@ public class DashboardController implements Initializable {
     public void ordersPay() {
         // хэрэглэгчийн ID үүсгэх.
         customerId();
-        String sql = "INSERT INTO customer_receipt (customer_id, total, amount, balance, date) " +
+        String sql = "INSERT INTO " + DB_TABLE_CUST_RECEIPT + " (customer_id, total, amount, balance, date) " +
                 "VALUES (?,?,?,?,?)";
-
         connect = Database.connectDB();
 
         try {
-
             if (totalP > 0 || orders_amount.getText().isEmpty() || amountP == 0) {
                 if (alert.confirmMessage("Та итгэлтэй байна уу?")) {
                     prepare = connect.prepareStatement(sql);
@@ -733,9 +722,9 @@ public class DashboardController implements Initializable {
     // Одоо байгаа хэрэглэгчийн бүх захиалгыг арилгана.
     public void ordersReset() {
         customerId();
-        String sql = "DELETE FROM customer WHERE customer_id = '" + ListData.customerId + "'";
-
+        String sql = "DELETE FROM " + DB_TABLE_CUSTOMER + " WHERE customer_id = '" + ListData.customerId + "'";
         connect = Database.connectDB();
+
         try {
             if (!orders_tableView.getItems().isEmpty()) {
                 if (alert.confirmMessage("Та дахин тохируулахдаа итгэлтэй байна уу?")) {
@@ -765,7 +754,6 @@ public class DashboardController implements Initializable {
         amountP = Double.parseDouble(orders_amount.getText());
 
         if (!orders_amount.getText().isEmpty()) {
-
             if (totalP > 0) {
                 if (amountP >= totalP) {
                     balanceP = (amountP - totalP);
@@ -790,23 +778,20 @@ public class DashboardController implements Initializable {
     public void ordersDisplayTotal() {
         customerId();
 
-        String sql = "SELECT SUM(price) FROM customer WHERE customer_id = '" + ListData.customerId + "'";
-
+        String sql = "SELECT SUM(price) FROM " + DB_TABLE_CUSTOMER + " WHERE customer_id = '" + ListData.customerId + "'";
         connect = Database.connectDB();
 
         try {
+            assert connect != null;
             prepare = connect.prepareStatement(sql);
             result = prepare.executeQuery();
-
 
             while (result.next()) {
                 // захиалгын нийт үнийг нэгтгэн гаргана.
                 totalP = result.getDouble("SUM(price)");
             }
             // Нийт үнийг шинэчилнэ.
-            orders_total.setText(String.valueOf(totalP) + "₮");
-
-
+            orders_total.setText(totalP + "₮");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -829,10 +814,9 @@ public class DashboardController implements Initializable {
     // Сонгосон бүтээгдэхүүний төрлөөс хамааран брэнд цэсийг дүүргэх
     public void ordersListBrand() {
 
-        String sql = "SELECT brand FROM product WHERE type = '"
+        String sql = "SELECT brand FROM " + DB_TABLE_PRODUCT + " WHERE type = '"
                 + orders_productType.getSelectionModel().getSelectedItem()
                 + "' and status = 'Боломжтой' GROUP BY brand";
-
         connect = Database.connectDB();
 
         try {
@@ -849,7 +833,6 @@ public class DashboardController implements Initializable {
             orders_brand.setItems(listData);
             // Сонгосон брэнд дээр үндэслэн бүтээгдэхүүний жагсаалтыг шинэчилнэ.
             ordersListProductName();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -857,10 +840,8 @@ public class DashboardController implements Initializable {
 
     // Сонгосон брэнд дээр үндэслэсэн бүтээгдэхүүний нэр цэсийг дүүргэх
     public void ordersListProductName() {
-
-        String sql = "SELECT product_name FROM product WHERE brand = '"
+        String sql = "SELECT product_name FROM " + DB_TABLE_PRODUCT + " WHERE brand = '"
                 + orders_brand.getSelectionModel().getSelectedItem() + "'";
-
         connect = Database.connectDB();
 
         try {
@@ -878,7 +859,6 @@ public class DashboardController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private SpinnerValueFactory<Integer> spinner;
@@ -897,14 +877,12 @@ public class DashboardController implements Initializable {
         qty = orders_quantity.getValue();
     }
 
-
     // Одоо байгаа хэрэглэгчдийн бүх захиалгыг өгөгдлийн сангаас татах.
     public ObservableList<CustomerData> ordersListData() {
-
         customerId();
-        ObservableList<CustomerData> listData = FXCollections.observableArrayList();
-        String sql = "SELECT * FROM customer WHERE customer_id = '" + ListData.customerId + "'";
 
+        ObservableList<CustomerData> listData = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM " + DB_TABLE_CUSTOMER + " WHERE customer_id = '" + ListData.customerId + "'";
         connect = Database.connectDB();
 
         try {
@@ -954,14 +932,12 @@ public class DashboardController implements Initializable {
 
     // Хэрэглэгчийн ID үүсгэх
     public void customerId() {
-
-        String customId = "SELECT * FROM customer";
-
+        String custId = "SELECT * FROM " + DB_TABLE_CUSTOMER + " ";
         connect = Database.connectDB();
 
         try {
             assert connect != null;
-            prepare = connect.prepareStatement(customId);
+            prepare = connect.prepareStatement(custId);
             result = prepare.executeQuery();
 
             int checkId = 0;
@@ -971,7 +947,7 @@ public class DashboardController implements Initializable {
                 ListData.customerId = result.getInt("customer_id");
             }
 
-            String checkData = "SELECT * FROM customer_receipt";
+            String checkData = "SELECT * FROM " + DB_TABLE_CUST_RECEIPT + " ";
             statement = connect.createStatement();
             result = statement.executeQuery(checkData);
 
@@ -1006,12 +982,13 @@ public class DashboardController implements Initializable {
 
             homeDisplayTotalOrders();
             homeTotalIncome();
-            homeAvailableProduncts();
+            homeAvailableProducts();
 
             homeIncomeChart();
             homeOrdersChart();
+        }
 
-        } else if (event.getSource() == addProducts_btn) {
+        if (event.getSource() == addProducts_btn) {
             home_form.setVisible(false);
             addProducts_form.setVisible(true);
             orders_form.setVisible(false);
@@ -1024,8 +1001,9 @@ public class DashboardController implements Initializable {
             addProductsListStatus();
             addProductsListType();
             addProductsSearch();
+        }
 
-        } else if (event.getSource() == orders_btn) {
+        if (event.getSource() == orders_btn) {
             home_form.setVisible(false);
             addProducts_form.setVisible(false);
             orders_form.setVisible(true);
@@ -1108,7 +1086,7 @@ public class DashboardController implements Initializable {
 
         homeDisplayTotalOrders();
         homeTotalIncome();
-        homeAvailableProduncts();
+        homeAvailableProducts();
 
         homeIncomeChart();
         homeOrdersChart();

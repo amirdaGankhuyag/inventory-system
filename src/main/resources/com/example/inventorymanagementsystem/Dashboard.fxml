@@ -20,7 +20,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.inventorymanagementsystem.controller.DashboardController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.inventorymanagementsystem.DashboardController">
    <children>
       <AnchorPane fx:id="main_form" prefHeight="200.0" prefWidth="200.0">
          <children>
@@ -36,12 +36,12 @@
                                     <Font name="Tahoma" size="15.0" />
                                  </font>
                               </Label>
-                              <Button fx:id="close" layoutX="1044.0" layoutY="3.0" mnemonicParsing="false" onAction="#close" prefHeight="24.0" prefWidth="60.0" styleClass="close" stylesheets="@../../../design/DashboardDesign.css" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="3.0">
+                              <Button layoutX="1044.0" layoutY="3.0" mnemonicParsing="false" onAction="#close" prefHeight="24.0" prefWidth="60.0" styleClass="close" stylesheets="@../../../design/DashboardDesign.css" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="3.0">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="CLOSE" size="1.2em" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="minimize" layoutX="990.0" layoutY="4.0" mnemonicParsing="false" onAction="#minimize" prefWidth="53.0" styleClass="minimize" stylesheets="@../../../design/DashboardDesign.css">
+                              <Button layoutX="990.0" layoutY="4.0" mnemonicParsing="false" onAction="#minimize" prefWidth="53.0" styleClass="minimize" stylesheets="@../../../design/DashboardDesign.css">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="MINUS" size="1.2em" />
                                  </graphic>

@@ -1,7 +1,5 @@
-package com.example.inventorymanagementsystem.controller;
+package com.example.inventorymanagementsystem;
 
-import com.example.inventorymanagementsystem.AlertMessage;
-import com.example.inventorymanagementsystem.Database;
 import com.example.inventorymanagementsystem.data.ListData;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -82,7 +80,6 @@ public class MainController {
                 // Логин цонхыг нуух
                 loginBtn.getScene().getWindow().hide();
 
-                // Dashboard хуудас нээх
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Dashboard.fxml")));
                 Stage stage = new Stage();
                 stage.setTitle("Бараа агуулахын систем | Админ хуудас");
@@ -106,7 +103,7 @@ public class MainController {
                 alert.errorMessage("Нэвтрэх нэр эсвэл нууц үг буруу байна!");
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
