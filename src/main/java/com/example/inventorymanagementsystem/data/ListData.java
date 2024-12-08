@@ -3,6 +3,9 @@ package com.example.inventorymanagementsystem.data;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SpinnerValueFactory;
 
+/**
+ * ListData класс нь DashboardController класст ашиглагдаж буй хувьсагчдыг агуулна.
+ * */
 public class ListData {
 
     public static String username;

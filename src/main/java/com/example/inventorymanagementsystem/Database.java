@@ -3,6 +3,9 @@ package com.example.inventorymanagementsystem;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+/**
+ * MySQL DB тохиргооны класс.
+ * */
 public class Database {
     public static Connection connectDB() {
         try {

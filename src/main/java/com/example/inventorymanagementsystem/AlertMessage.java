@@ -5,6 +5,9 @@ import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
+/**
+ * Төрөл бүрийн аlert-уудыг агуулсан класс.
+ * */
 public class AlertMessage {
 
     private Alert alert;

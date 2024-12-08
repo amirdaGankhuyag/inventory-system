@@ -2,6 +2,10 @@ package com.example.inventorymanagementsystem.data;
 
 import java.sql.Date;
 
+/**
+* CustomerData класс нь захиалагчийн мэдээллийг хадгална.
+* */
+
 public class CustomerData {
     private Integer customerId;
     private String type;

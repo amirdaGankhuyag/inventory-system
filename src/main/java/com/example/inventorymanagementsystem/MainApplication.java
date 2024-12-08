@@ -9,6 +9,14 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
+/**
+ * Inventory Management System үндсэн класс.
+ *
+ * @author Amirda Gankhuyag
+ * @author Usukhbayar Munguntulga
+ *
+ * @since 1.0
+ * */
 public class MainApplication extends Application {
     private double x = 0;
     private double y = 0;

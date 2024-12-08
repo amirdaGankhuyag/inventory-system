@@ -42,9 +42,14 @@ import java.util.*;
 import static com.example.inventorymanagementsystem.data.ListData.*;
 
 /**
- * DashboardController нь dashboard UI болон backend хоорондын харилцан үйлчлэлийг удирдана.
+ * DashboardController нь dashboard UI болон backend хоорондын ажиллагааг удирдана.
  * <p>
- * Энэ нь статистик мэдээллийг харуулах, бүтээгдэхүүнтэй харьцах, захиалгыг удирдах функцуудыг агуулдаг.
+ * home - Тухайн угтвараар эхэлсэн функцууд нь НҮҮР цэсэнд ажиллах функцууд.
+ * <p>
+ * addProducts - Тухайн угтвараар эхэлсэн функцууд нь БАРАА цэсэнд ажиллах функцууд.
+ * <p>
+ * orders - Тухайн угтвараар эхэлсэн функцууд нь ЗАХИАЛГА цэсэнд ажиллах функцууд.
+ * <p>
  **/
 
 public class DashboardController implements Initializable {
@@ -467,6 +472,7 @@ public class DashboardController implements Initializable {
         addProducts_productType.setItems(addDataToList(ListData.listType));
     }
 
+
     public void addProductsListStatus() {
         addProducts_status.setItems(addDataToList(ListData.listStatus));
     }
@@ -476,10 +482,14 @@ public class DashboardController implements Initializable {
      *
      * @param listItems нэмэх өгөгдлүүд
      */
-    public ObservableList addDataToList(String[] listItems) {
+    public ObservableList<String> addDataToList(String[] listItems) {
+        if (listItems == null) {
+            return FXCollections.observableArrayList();
+        }
         List<String> list = new ArrayList<>(Arrays.asList(listItems));
         return FXCollections.observableArrayList(list);
     }
+
 
     /**
      * Бараа хайх
@@ -578,7 +588,8 @@ public class DashboardController implements Initializable {
         ProductData prodD = addProducts_tableView.getSelectionModel().getSelectedItem();
         int num = addProducts_tableView.getSelectionModel().getSelectedIndex();
 
-        if ((num - 1) < -1) return;
+        // сонгогдоогүй бол
+        if (prodD == null || num < 0) return;
 
         addProducts_productId.setText(String.valueOf(prodD.getProductId()));
         addProducts_productType.getSelectionModel().select(prodD.getType());
@@ -587,10 +598,15 @@ public class DashboardController implements Initializable {
         addProducts_status.getSelectionModel().select(prodD.getStatus());
         addProducts_price.setText(String.valueOf(prodD.getPrice()));
 
-        String uri = "file: " + prodD.getImage();
-        image = new Image(uri, 111, 136, false, true);
-        addProducts_imageView.setImage(image);
-        ListData.path = prodD.getImage();
+        if (prodD.getImage() != null && !prodD.getImage().isEmpty()) {
+            String uri = "file:" + prodD.getImage();
+            image = new Image(uri, 111, 136, false, true);
+            addProducts_imageView.setImage(image);
+            ListData.path = prodD.getImage();
+        } else {
+            addProducts_imageView.setImage(null);
+            ListData.path = null;
+        }
     }
 
     /**
@@ -660,7 +676,7 @@ public class DashboardController implements Initializable {
         connect = Database.connectDB();
 
         try {
-            if (!(totalP > 0 || orders_amount.getText().isEmpty() || amountP == 0)) {
+            if (!(totalP > 0 && !orders_amount.getText().isEmpty() && amountP > 0)) {
                 alert.errorMessage("Хүчингүй. Дахин шалгана уу.");
                 return;
             }
@@ -693,7 +709,7 @@ public class DashboardController implements Initializable {
     /**
      * JasperReports ашиглан хэрэглэгчийн баримтыг үүсгэх функц.
      */
-    public void orderReceipt() {
+    public void ordersReceipt() {
         HashMap hash = new HashMap();
         // Баримтыг одоогийн хэрэглэгчийн ID-тай холбоно.
         hash.put("inventoryP", ListData.customerId);
@@ -745,11 +761,11 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     *  Нийт үнэ болон оруулсан дүнгийн зөрүүг тооцоолсны дараа үлдэгдлийг шинэчилнэ
+     * Нийт үнэ болон оруулсан дүнгийн зөрүүг тооцоолсны дараа үлдэгдлийг шинэчилнэ
      */
     public void ordersAmount() {
         if (orders_amount.getText().isEmpty()) {
-            alert.errorMessage("Хэмжээгээ оруулна уу!");
+            alert.errorMessage("Төлөх дүнгээ оруулна уу!");
             return;
         }
 

@@ -17,6 +17,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Objects;
 
+/**
+ * Үндсэн controller.
+ * */
 public class MainController {
     @FXML
     private Button loginBtn;

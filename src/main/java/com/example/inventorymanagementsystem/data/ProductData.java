@@ -2,6 +2,9 @@ package com.example.inventorymanagementsystem.data;
 
 import java.sql.Date;
 
+/**
+ * ProductData класс нь барааны мэдээллийг илэрхийлнэ.
+ * */
 public class ProductData {
     private Integer productId;
     private String type;
@@ -13,8 +16,6 @@ public class ProductData {
     private Date date;
 
     /**
-     * ProductData объект нь барааны мэдээллийг илэрхийлнэ.
-     *
      * @param productId   Барааны ID.
      * @param type        Бүтээгдэхүүний төрөл (жишээ нь, зууш, ундаа).
      * @param brand       Бүтээгдэхүүний брэнд.
